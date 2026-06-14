@@ -12,6 +12,7 @@ import {
   FileImage,
   Minus,
   PackageCheck,
+  Play,
   Plus,
   Printer,
   Send,
@@ -89,6 +90,39 @@ const faqItems = [
   ["Сколько стоит?", "Калькулятор даст ориентир. Точно скажем после проверки."],
   ["Как передать фото?", "Через Telegram, WhatsApp или ссылкой на облако."],
   ["Можно срочно?", "Если есть окно в графике, сделаем быстрее."]
+] as const;
+
+const reelVideos = [
+  {
+    title: "Рождение раскраски",
+    caption: "Фото, линии, разворот",
+    src: "/reels/IMG_5563.MOV",
+    poster: "/works/coloring-1.jpg"
+  },
+  {
+    title: "Печать и сборка",
+    caption: "Листы выходят красиво",
+    src: "/reels/IMG_5564.MOV",
+    poster: "/works/printing-1.jpg"
+  },
+  {
+    title: "Стикеры и резка",
+    caption: "Отклеивается как надо",
+    src: "/reels/IMG_5565.MOV",
+    poster: "/works/stickers-1.jpg"
+  },
+  {
+    title: "Упаковка заказа",
+    caption: "Важное внутри",
+    src: "/reels/IMG_5566.MOV",
+    poster: "/works/packaging-1.jpg"
+  },
+  {
+    title: "Готовая красота",
+    caption: "Проверяем детали",
+    src: "/reels/IMG_5567.MOV",
+    poster: "/works/card-1.jpg"
+  }
 ] as const;
 
 type BuilderState = {
@@ -203,6 +237,7 @@ export default function Ver2Landing() {
       <HeroScene />
       <ProductChooser chooseProduct={chooseProduct} active={builder.product} />
       <ColoringSlider />
+      <ProcessReels />
       <HorizontalGallery galleryRef={galleryRef} trackRef={galleryTrackRef} />
       <OrderBuilder
         builder={builder}
@@ -217,6 +252,64 @@ export default function Ver2Landing() {
       <CompactFAQ />
       <QuickOrder builder={builder} price={price.total} copiedToForm={copiedToForm} />
     </main>
+  );
+}
+
+function ProcessReels() {
+  return (
+    <section className="mx-auto max-w-7xl px-4 py-20 sm:px-6 lg:px-8">
+      <div className="mb-10 flex flex-col gap-3 md:flex-row md:items-end md:justify-between">
+        <div>
+          <p className="font-black uppercase text-pinkBrand">Процесс</p>
+          <h2 className="font-display text-4xl font-black uppercase sm:text-6xl">
+            Как это рождается
+          </h2>
+        </div>
+        <p className="max-w-sm text-lg font-black text-graphite/60">
+          Вертикальные ролики без звука: печать, резка, сборка, упаковка.
+        </p>
+      </div>
+      <div className="flex gap-5 overflow-x-auto pb-5">
+        {reelVideos.map((video, index) => (
+          <motion.article
+            key={video.src}
+            whileHover={{ y: -10, rotate: index % 2 ? 2 : -2 }}
+            className="group relative aspect-[9/16] h-[560px] max-h-[78vh] min-h-[430px] w-[250px] shrink-0 overflow-hidden rounded-[2rem] bg-graphite shadow-paper sm:w-[315px]"
+          >
+            <video
+              className="h-full w-full object-cover"
+              src={video.src}
+              poster={video.poster}
+              muted
+              playsInline
+              loop
+              preload="metadata"
+              onMouseEnter={(event) => event.currentTarget.play().catch(() => undefined)}
+              onMouseLeave={(event) => {
+                event.currentTarget.pause();
+                event.currentTarget.currentTime = 0;
+              }}
+            />
+            <div className="absolute inset-0 bg-gradient-to-t from-graphite via-graphite/10 to-transparent" />
+            <div className="absolute left-4 right-4 top-4 flex items-center justify-between">
+              <span className="rounded-full bg-white/90 px-3 py-2 text-xs font-black uppercase text-pinkBrand">
+                reel {index + 1}
+              </span>
+              <span className="grid h-10 w-10 place-items-center rounded-full bg-pinkBrand text-white shadow-sticker">
+                <Play size={18} fill="currentColor" />
+              </span>
+            </div>
+            <div className="absolute inset-x-4 bottom-4 rounded-2xl bg-white/92 p-4 backdrop-blur">
+              <h3 className="font-display text-xl font-black uppercase text-graphite">{video.title}</h3>
+              <p className="mt-1 text-sm font-bold text-graphite/62">{video.caption}</p>
+            </div>
+          </motion.article>
+        ))}
+      </div>
+      <p className="mt-2 text-sm font-bold text-graphite/45">
+        Ролики проигрываются без звука и показывают процесс создания заказа.
+      </p>
+    </section>
   );
 }
 
