@@ -12,8 +12,8 @@ const config: Config = {
         neutralInk: "#8A8D94"
       },
       fontFamily: {
-        display: ["Arial Black", "Arial", "sans-serif"],
-        sans: ["Manrope", "Inter", "Arial", "sans-serif"]
+        display: ["Unbounded", "Arial Black", "Arial", "sans-serif"],
+        sans: ["Unbounded", "Inter", "Arial", "sans-serif"]
       },
       boxShadow: {
         sticker: "0 22px 55px rgba(255, 77, 125, 0.28)",
