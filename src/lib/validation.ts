@@ -6,8 +6,7 @@ export const orderSchema = z.object({
   phone: z
     .string()
     .trim()
-    .min(6, "Укажите телефон")
-    .regex(/^[0-9+\-()\s]+$/, "Проверьте формат телефона"),
+    .min(3, "Укажите телефон или мессенджер"),
   messenger: z.string().trim().optional().default(""),
   service: z.enum(serviceTypes),
   format: z.enum(formats),

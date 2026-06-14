@@ -14,3 +14,4 @@ pnpm-debug.log*
 # Source image dumps kept outside the deployable app.
 /*.jpg
 /*.jpeg
+.vercel
