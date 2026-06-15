@@ -16,8 +16,11 @@ import {
   Minus,
   Play,
   Plus,
+  Rows3,
   Send,
-  Sparkles
+  ShoppingBag,
+  Sparkles,
+  Wrench
 } from "lucide-react";
 import {
   calculateOrderPrice,
@@ -175,7 +178,8 @@ export default function Ver2Landing() {
 
   useEffect(() => {
     const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-    if (reduceMotion) return;
+    const desktopQuery = window.matchMedia("(min-width: 1024px)");
+    if (reduceMotion || !desktopQuery.matches) return;
 
     const lenis = new Lenis({ lerp: 0.08, wheelMultiplier: 0.9 });
     let rafId = 0;
@@ -260,13 +264,27 @@ export default function Ver2Landing() {
       <EmotionReasons />
       <CompactFAQ />
       <QuickOrder builder={builder} price={price.total} copiedToForm={copiedToForm} />
+      <MobileBottomCTA />
     </main>
   );
 }
 
 function ProcessReels() {
+  const [activeReel, setActiveReel] = useState(0);
+
+  function toggleVideo(event: React.PointerEvent<HTMLElement>, index: number) {
+    const videoElement = event.currentTarget.querySelector("video");
+    if (!videoElement) return;
+    setActiveReel(index);
+    if (videoElement.paused) {
+      videoElement.play().catch(() => undefined);
+      return;
+    }
+    videoElement.pause();
+  }
+
   return (
-    <section className="mx-auto max-w-7xl px-4 py-20 sm:px-6 lg:px-8">
+    <section className="mx-auto max-w-7xl px-4 py-[clamp(3.5rem,12vw,5rem)] sm:px-6 lg:px-8 lg:py-20">
       <div className="mb-10 flex flex-col gap-3 md:flex-row md:items-end md:justify-between">
         <div>
           <p className="font-black uppercase text-pinkBrand">Процесс</p>
@@ -278,11 +296,13 @@ function ProcessReels() {
           Маленькая магия: из файла на экране рождается вещь, которую хочется держать в руках.
         </p>
       </div>
-      <div className="flex gap-5 overflow-x-auto pb-5">
+      <div className="mobile-snap flex gap-4 overflow-x-auto pb-5 sm:gap-5">
         {reelVideos.map((video, index) => (
           <motion.article
             key={video.src}
             whileHover={{ y: -10, rotate: index % 2 ? 2 : -2 }}
+            whileTap={{ scale: 0.985 }}
+            onPointerUp={(event) => toggleVideo(event, index)}
             onMouseEnter={(event) => {
               const videoElement = event.currentTarget.querySelector("video");
               videoElement?.play().catch(() => undefined);
@@ -293,7 +313,7 @@ function ProcessReels() {
               videoElement.pause();
               videoElement.currentTime = 0;
             }}
-            className="group relative aspect-[9/16] h-[560px] max-h-[78vh] min-h-[430px] w-[250px] shrink-0 overflow-hidden rounded-[2rem] bg-graphite shadow-paper sm:w-[315px]"
+            className="group relative aspect-[9/16] h-[min(68vh,520px)] min-h-[390px] w-[min(78vw,315px)] shrink-0 snap-center overflow-hidden rounded-[1.6rem] bg-graphite shadow-paper sm:w-[315px] lg:rounded-[2rem]"
           >
             <video
               className="h-full w-full object-cover"
@@ -309,7 +329,7 @@ function ProcessReels() {
               <span className="rounded-full bg-white/90 px-3 py-2 text-xs font-black uppercase text-pinkBrand">
                 reel {index + 1}
               </span>
-              <span className="grid h-10 w-10 place-items-center rounded-full bg-pinkBrand text-white shadow-sticker">
+              <span className={`grid h-11 w-11 place-items-center rounded-full text-white shadow-sticker transition ${activeReel === index ? "bg-graphite" : "bg-pinkBrand"}`}>
                 <Play size={18} fill="currentColor" />
               </span>
             </div>
@@ -320,8 +340,11 @@ function ProcessReels() {
           </motion.article>
         ))}
       </div>
-      <p className="mt-2 text-sm font-bold text-graphite/45">
+      <p className="mt-2 text-sm font-bold text-graphite/45 max-md:hidden">
         Наведите курсор на карточку — и процесс оживет.
+      </p>
+      <p className="mt-2 text-sm font-bold text-graphite/45 md:hidden">
+        Нажмите на ролик, чтобы оживить процесс.
       </p>
     </section>
   );
@@ -329,7 +352,7 @@ function ProcessReels() {
 
 function HeroScene() {
   return (
-    <section className="ver2-hero relative isolate min-h-screen overflow-hidden px-4 py-6 sm:px-6 lg:px-8">
+    <section className="ver2-hero relative isolate min-h-[92svh] overflow-hidden px-4 pb-20 pt-4 sm:px-6 lg:min-h-screen lg:px-8 lg:py-6">
       <Image
         src="/generated/optimized/hero-print-products.jpg"
         alt="Печатные вещи Наша печать"
@@ -341,8 +364,11 @@ function HeroScene() {
       <div className="absolute inset-0 -z-10 bg-gradient-to-br from-white/95 via-white/68 to-pinkSoft/76" />
       <div className="absolute inset-x-0 bottom-0 -z-10 h-48 bg-gradient-to-t from-milk to-transparent" />
       <CloudPlayground />
-      <nav className="relative z-50 mx-auto flex max-w-7xl items-center justify-between rounded-full bg-white/82 px-5 py-4 shadow-paper backdrop-blur">
-        <a href="/" className="relative h-14 w-64 overflow-hidden" aria-label="Наша печать">
+      <div className="pointer-events-none absolute left-[7%] top-28 z-10 h-16 w-24 rotate-[-10deg] rounded-2xl bg-white/82 shadow-paper backdrop-blur md:hidden" />
+      <div className="pointer-events-none absolute right-[-12px] top-48 z-10 h-24 w-20 rotate-[12deg] rounded-[1.5rem] bg-pinkSoft/82 shadow-paper md:hidden" />
+      <div className="pointer-events-none absolute bottom-28 left-[-18px] z-10 h-20 w-20 rounded-full bg-pinkBrand/20 blur-sm md:hidden" />
+      <nav className="relative z-50 mx-auto flex max-w-7xl items-center justify-between rounded-full bg-white/86 px-3 py-3 shadow-paper backdrop-blur sm:px-5 sm:py-4">
+        <a href="/" className="relative h-11 w-[min(54vw,16rem)] overflow-hidden sm:h-14 sm:w-64" aria-label="Наша печать">
           <Image src="/brand/logos/logo-wide-alt.svg" alt="Наша печать" fill className="object-contain object-left" priority />
         </a>
         <div className="hidden gap-6 text-sm font-black uppercase text-graphite/60 md:flex">
@@ -350,11 +376,14 @@ function HeroScene() {
           <a href="#ver2-gallery">Работы</a>
           <a href="#ver2-builder">Собрать</a>
         </div>
+        <a href="#ver2-order" className="inline-flex min-h-11 items-center rounded-full bg-pinkBrand px-4 text-xs font-black uppercase text-white shadow-sticker md:hidden">
+          Заявка
+        </a>
       </nav>
 
-      <div className="relative z-20 mx-auto flex min-h-[calc(100vh-7.5rem)] max-w-7xl items-center justify-center py-20 text-center">
+      <div className="relative z-20 mx-auto flex min-h-[calc(92svh-6rem)] max-w-7xl items-center justify-center py-[clamp(3.5rem,14vw,5rem)] text-center lg:min-h-[calc(100vh-7.5rem)] lg:py-20">
         <div className="pointer-events-none select-none">
-          <div className="space-y-2 overflow-hidden font-display text-[clamp(3rem,7.6vw,7.4rem)] font-black uppercase leading-[0.88] tracking-normal">
+          <div className="space-y-2 overflow-hidden font-display text-[clamp(2.35rem,12.5vw,7.4rem)] font-black uppercase leading-[0.9] tracking-normal sm:text-[clamp(3rem,7.6vw,7.4rem)]">
             {["Печатаем смело.", "Делаем красиво."].map((line, index) => (
               <motion.h1
                 key={line}
@@ -376,10 +405,10 @@ function HeroScene() {
             Раскраски по фото, стикеры, открытки, визитки и печатные подарки.
           </motion.p>
           <motion.div className="pointer-events-auto mt-9 flex flex-col justify-center gap-3 sm:flex-row" initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.65 }}>
-            <a href="#ver2-builder" className="magnetic rounded-full bg-pinkBrand px-7 py-4 text-center font-black uppercase text-white shadow-sticker">
+            <a href="#ver2-builder" className="magnetic inline-flex min-h-12 items-center justify-center rounded-full bg-pinkBrand px-7 py-4 text-center font-black uppercase text-white shadow-sticker">
               Собрать заказ
             </a>
-            <a href="#ver2-gallery" className="magnetic rounded-full border-2 border-graphite bg-white px-7 py-4 text-center font-black uppercase text-graphite">
+            <a href="#ver2-gallery" className="magnetic inline-flex min-h-12 items-center justify-center rounded-full border-2 border-graphite bg-white px-7 py-4 text-center font-black uppercase text-graphite">
               Смотреть работы
             </a>
           </motion.div>
@@ -574,26 +603,29 @@ function ProductChooser({
   chooseProduct: (product: keyof typeof serviceMap) => void;
 }) {
   return (
-    <section id="ver2-products" className="mx-auto max-w-7xl px-4 py-20 sm:px-6 lg:px-8">
+    <section id="ver2-products" className="mx-auto max-w-7xl px-4 py-[clamp(3.5rem,12vw,5rem)] sm:px-6 lg:px-8 lg:py-20">
       <div className="mb-10 flex flex-col gap-3 md:flex-row md:items-end md:justify-between">
         <h2 className="font-display text-4xl font-black uppercase sm:text-6xl">Что печатаем?</h2>
         <p className="max-w-md text-lg font-black text-graphite/60">Выберите вещь. Остальное подскажем.</p>
       </div>
-      <div className="grid gap-4 md:grid-cols-3">
+      <div className="mobile-snap -mx-4 flex gap-4 overflow-x-auto px-4 pb-4 md:mx-0 md:grid md:grid-cols-3 md:overflow-visible md:px-0 md:pb-0">
         {products.map((item) => (
           <button
             key={item.short}
             type="button"
             onClick={() => chooseProduct(item.short as keyof typeof serviceMap)}
-            className={`group peeled min-h-[300px] overflow-hidden rounded-[2rem] border bg-white p-4 text-left shadow-paper transition ${
+            className={`group peeled min-h-[340px] w-[min(82vw,22rem)] shrink-0 snap-center overflow-hidden rounded-[1.6rem] border bg-white p-4 text-left shadow-paper transition md:w-auto lg:rounded-[2rem] ${
               active === item.short ? "border-pinkBrand ring-4 ring-pinkSoft" : "border-graphite/10"
             }`}
           >
-            <div className="relative h-40 overflow-hidden rounded-[1.5rem] bg-pinkSoft">
+            <div className="relative h-44 overflow-hidden rounded-[1.25rem] bg-pinkSoft sm:h-48 lg:rounded-[1.5rem]">
               <Image src={item.image} alt={item.short} fill className={`object-cover transition duration-500 ${item.move}`} />
             </div>
             <h3 className="mt-5 font-display text-3xl font-black uppercase">{item.short}</h3>
             <p className="mt-2 font-bold text-graphite/62">{item.line}</p>
+            <span className="mt-5 inline-flex min-h-11 items-center rounded-full bg-pinkBrand px-5 text-sm font-black uppercase text-white shadow-sticker">
+              Выбрать
+            </span>
           </button>
         ))}
       </div>
@@ -603,20 +635,20 @@ function ProductChooser({
 
 function ColoringSlider() {
   const [position, setPosition] = useState(58);
-  const mode = position < 50 ? "До" : "После";
+  const mode = position < 50 ? "Фото" : "Раскраска";
 
   return (
-    <section className="mx-auto grid max-w-7xl gap-8 px-4 py-20 sm:px-6 lg:grid-cols-[0.75fr_1.25fr] lg:px-8">
+    <section className="mx-auto grid max-w-7xl gap-8 px-4 py-[clamp(3.5rem,12vw,5rem)] sm:px-6 lg:grid-cols-[0.75fr_1.25fr] lg:px-8 lg:py-20">
       <div className="self-center">
         <p className="font-black uppercase text-pinkBrand">Фото → раскраска</p>
         <h2 className="mt-3 font-display text-4xl font-black uppercase sm:text-6xl">Из фото — в личную раскраску</h2>
         <p className="mt-5 text-lg font-bold leading-relaxed text-graphite/65">Переключите до/после. Так фотография становится личной раскраской.</p>
-        <a href="#ver2-order" className="magnetic mt-7 inline-flex rounded-full bg-pinkBrand px-7 py-4 font-black uppercase text-white shadow-sticker">
+        <a href="#ver2-order" className="magnetic mt-7 inline-flex min-h-12 items-center rounded-full bg-pinkBrand px-7 py-4 font-black uppercase text-white shadow-sticker">
           Хочу такую раскраску
         </a>
       </div>
-      <div className="relative overflow-hidden rounded-[2.5rem] bg-white p-4 shadow-paper">
-        <div className="relative aspect-[4/3] overflow-hidden rounded-[2rem]">
+      <div className="relative overflow-hidden rounded-[1.75rem] bg-white p-2 shadow-paper sm:p-4 lg:rounded-[2.5rem]">
+        <div className="relative aspect-[4/3] overflow-hidden rounded-[1.35rem] lg:rounded-[2rem]">
           <Image src="/works/optimized/coloring-2.jpg" alt="Фото до превращения в раскраску" fill className="object-cover" />
           <div
             className="absolute inset-0 overflow-hidden"
@@ -626,10 +658,10 @@ function ColoringSlider() {
             <div className="absolute inset-0 bg-white/35 mix-blend-screen" />
           </div>
           <div
-            className="pointer-events-none absolute inset-y-5 z-10 w-1 rounded-full bg-pinkBrand shadow-sticker"
+            className="pointer-events-none absolute inset-y-4 z-10 w-1.5 rounded-full bg-pinkBrand shadow-sticker"
             style={{ left: `${position}%` }}
           >
-            <span className="absolute left-1/2 top-1/2 grid h-12 w-12 -translate-x-1/2 -translate-y-1/2 place-items-center rounded-full bg-pinkBrand text-lg font-black text-white shadow-sticker">
+            <span className="absolute left-1/2 top-1/2 grid h-14 w-14 -translate-x-1/2 -translate-y-1/2 place-items-center rounded-full bg-pinkBrand text-lg font-black text-white shadow-sticker">
               ↔
             </span>
           </div>
@@ -642,13 +674,13 @@ function ColoringSlider() {
             value={position}
             onChange={(event) => setPosition(Number(event.target.value))}
           />
-          <div className="absolute left-1/2 top-5 z-30 flex -translate-x-1/2 rounded-full bg-white/88 p-1 shadow-paper backdrop-blur">
-            {(["До", "После"] as const).map((item) => (
+          <div className="absolute left-1/2 top-4 z-30 flex -translate-x-1/2 rounded-full bg-white/90 p-1 shadow-paper backdrop-blur">
+            {(["Фото", "Раскраска"] as const).map((item) => (
               <button
                 key={item}
                 type="button"
-                onClick={() => setPosition(item === "До" ? 10 : 90)}
-                className={`rounded-full px-5 py-3 text-xs font-black uppercase transition ${
+                onClick={() => setPosition(item === "Фото" ? 10 : 90)}
+                className={`min-h-11 rounded-full px-4 py-3 text-xs font-black uppercase transition sm:px-5 ${
                   mode === item ? "bg-pinkBrand text-white shadow-sticker" : "text-graphite/60"
                 }`}
               >
@@ -670,29 +702,29 @@ function HorizontalGallery({
   trackRef: React.RefObject<HTMLDivElement | null>;
 }) {
   const cards = [
-    { ...works[0], size: "h-[470px] w-[420px]" },
-    { ...works[1], size: "h-[520px] w-[330px]" },
-    { ...works[2], size: "h-[390px] w-[560px]" },
-    { ...works[3], size: "h-[360px] w-[320px]" },
-    { ...works[4], size: "h-[470px] w-[380px]" },
-    { ...works[5], size: "h-[410px] w-[520px]" }
+    { ...works[0], desktopSize: "lg:h-[470px] lg:w-[420px]" },
+    { ...works[1], desktopSize: "lg:h-[520px] lg:w-[330px]" },
+    { ...works[2], desktopSize: "lg:h-[390px] lg:w-[560px]" },
+    { ...works[3], desktopSize: "lg:h-[360px] lg:w-[320px]" },
+    { ...works[4], desktopSize: "lg:h-[470px] lg:w-[380px]" },
+    { ...works[5], desktopSize: "lg:h-[410px] lg:w-[520px]" }
   ];
 
   return (
-    <section id="ver2-gallery" ref={galleryRef} className="relative min-h-screen overflow-hidden bg-graphite py-16 text-white">
+    <section id="ver2-gallery" ref={galleryRef} className="relative overflow-hidden bg-graphite py-16 text-white lg:min-h-screen">
       <div className="px-4 sm:px-6 lg:px-8">
         <p className="font-black uppercase text-pinkSoft">Витрина работ</p>
         <h2 className="mt-2 font-display text-4xl font-black uppercase sm:text-6xl">Едут по печатной ленте</h2>
       </div>
-      <div ref={trackRef} className="mt-12 flex w-max max-w-none items-end gap-5 px-4 sm:px-6 lg:px-8">
+      <div ref={trackRef} className="mobile-snap mt-10 flex w-auto max-w-none items-end gap-4 overflow-x-auto px-4 pb-5 sm:px-6 lg:mt-12 lg:w-max lg:gap-5 lg:overflow-visible lg:px-8 lg:pb-0">
         {cards.map((work, index) => (
-          <article key={`${work.title}-${index}`} className={`${work.size} peeled group shrink-0 overflow-hidden rounded-[2rem] bg-white p-3 text-graphite shadow-sticker`}>
-            <div className="relative h-full overflow-hidden rounded-[1.5rem]">
+          <article key={`${work.title}-${index}`} className={`peeled group h-[min(72vh,470px)] w-[min(84vw,390px)] shrink-0 snap-center overflow-hidden rounded-[1.6rem] bg-white p-2 text-graphite shadow-sticker ${work.desktopSize} lg:rounded-[2rem] lg:p-3`}>
+            <div className="relative h-full overflow-hidden rounded-[1.25rem] lg:rounded-[1.5rem]">
               <Image src={optimizedWorkImage(work.image)} alt={work.title} fill className="object-cover transition duration-700 group-hover:scale-110" />
               <div className="absolute inset-x-4 bottom-4 rounded-2xl bg-white/90 p-4 backdrop-blur">
                 <p className="text-xs font-black uppercase text-pinkBrand">{work.category}</p>
                 <h3 className="mt-1 font-display text-2xl font-black uppercase">{work.title}</h3>
-                <a href="#ver2-order" className="mt-3 inline-flex rounded-full bg-pinkBrand px-4 py-2 text-xs font-black uppercase text-white">
+                <a href="#ver2-order" className="mt-3 inline-flex min-h-11 items-center rounded-full bg-pinkBrand px-4 py-2 text-xs font-black uppercase text-white">
                   Хочу так же
                 </a>
               </div>
@@ -718,10 +750,15 @@ function OrderBuilder({
   passToForm: () => void;
 }) {
   return (
-    <section id="ver2-builder" className="mx-auto grid max-w-7xl gap-7 px-4 py-20 sm:px-6 lg:grid-cols-[1.05fr_0.95fr] lg:px-8">
+    <section id="ver2-builder" className="mx-auto grid max-w-7xl gap-7 px-4 py-[clamp(3.5rem,12vw,5rem)] sm:px-6 lg:grid-cols-[1.05fr_0.95fr] lg:px-8 lg:py-20">
       <div>
         <p className="font-black uppercase text-pinkBrand">Конструктор заказа</p>
         <h2 className="mt-2 font-display text-4xl font-black uppercase sm:text-6xl">Соберите заказ</h2>
+        <div className="mt-6 flex gap-2 overflow-x-auto pb-1 text-xs font-black uppercase text-graphite/45 md:hidden">
+          {["1 Что", "2 Формат", "3 Кол-во", "4 Итог"].map((step) => (
+            <span key={step} className="shrink-0 rounded-full bg-white px-4 py-2 shadow-paper">{step}</span>
+          ))}
+        </div>
         <BuilderGroup title="Что делаем?">
           {Object.keys(serviceMap).map((item) => (
             <Chip key={item} active={builder.product === item} onClick={() => chooseProduct(item as keyof typeof serviceMap)}>
@@ -739,13 +776,13 @@ function OrderBuilder({
         <div className="my-8 rounded-[2rem] bg-white p-5 shadow-paper">
           <p className="text-sm font-black uppercase text-graphite/55">Количество</p>
           <div className="mt-4 flex items-center gap-4">
-            <button className="grid h-14 w-14 place-items-center rounded-full bg-graphite text-white" onClick={() => updateBuilder({ quantity: Math.max(1, builder.quantity - 1) })}>
+            <button className="grid h-14 w-14 shrink-0 place-items-center rounded-full bg-graphite text-white" onClick={() => updateBuilder({ quantity: Math.max(1, builder.quantity - 1) })}>
               <Minus />
             </button>
             <motion.div key={builder.quantity} initial={{ scale: 0.8 }} animate={{ scale: 1 }} className="font-display text-6xl font-black text-pinkBrand">
               {builder.quantity}
             </motion.div>
-            <button className="grid h-14 w-14 place-items-center rounded-full bg-pinkBrand text-white" onClick={() => updateBuilder({ quantity: builder.quantity + 1 })}>
+            <button className="grid h-14 w-14 shrink-0 place-items-center rounded-full bg-pinkBrand text-white" onClick={() => updateBuilder({ quantity: builder.quantity + 1 })}>
               <Plus />
             </button>
           </div>
@@ -755,8 +792,8 @@ function OrderBuilder({
         </div>
       </div>
 
-      <aside className="sticky top-6 h-fit overflow-hidden rounded-[2.5rem] bg-graphite p-6 text-white shadow-paper">
-        <div className="relative h-64 overflow-hidden rounded-[2rem]">
+      <aside className="sticky top-4 h-fit overflow-hidden rounded-[1.8rem] bg-graphite p-4 text-white shadow-paper sm:p-6 lg:top-6 lg:rounded-[2.5rem]">
+        <div className="relative h-48 overflow-hidden rounded-[1.35rem] sm:h-64 lg:rounded-[2rem]">
           <Image src="/generated/optimized/order-stack.jpg" alt="Превью заказа" fill className="object-cover" />
         </div>
         <div className="mt-6 min-h-48 rounded-[2rem] bg-white p-5 text-graphite">
@@ -770,7 +807,7 @@ function OrderBuilder({
             {formatRub(price)}
           </motion.p>
         </div>
-        <button onClick={passToForm} className="magnetic mt-5 w-full rounded-full bg-pinkBrand px-7 py-4 font-black uppercase text-white shadow-sticker">
+        <button onClick={passToForm} className="magnetic mt-5 min-h-12 w-full rounded-full bg-pinkBrand px-7 py-4 font-black uppercase text-white shadow-sticker">
           Передать в заявку
         </button>
       </aside>
@@ -781,10 +818,18 @@ function OrderBuilder({
 function GiftMiniGame() {
   const [clicks, setClicks] = useState(0);
   const [copied, setCopied] = useState(false);
-  const targetClicks = 18;
+  const [targetClicks, setTargetClicks] = useState(18);
   const progress = Math.min(100, Math.round((clicks / targetClicks) * 100));
   const unlocked = progress >= 100;
   const progressAngle = progress * 3.6;
+
+  useEffect(() => {
+    const mobileQuery = window.matchMedia("(max-width: 767px)");
+    const syncTarget = () => setTargetClicks(mobileQuery.matches ? 10 : 18);
+    syncTarget();
+    mobileQuery.addEventListener("change", syncTarget);
+    return () => mobileQuery.removeEventListener("change", syncTarget);
+  }, []);
 
   async function copyPromo() {
     await navigator.clipboard?.writeText("НАШИ10");
@@ -793,7 +838,7 @@ function GiftMiniGame() {
   }
 
   return (
-    <section className="mx-auto max-w-7xl px-4 py-20 sm:px-6 lg:px-8">
+    <section className="mx-auto max-w-7xl px-4 py-[clamp(3.5rem,12vw,5rem)] sm:px-6 lg:px-8 lg:py-20">
       <div className="mb-8 max-w-3xl">
         <h2 className="mt-2 font-display text-4xl font-black uppercase sm:text-6xl">Нажмите на вау</h2>
         <p className="mt-5 text-lg font-bold text-graphite/62">
@@ -801,7 +846,7 @@ function GiftMiniGame() {
         </p>
       </div>
       <motion.div
-        className="relative overflow-hidden rounded-[2.75rem] p-2 shadow-sticker"
+        className="relative overflow-hidden rounded-[1.9rem] p-2 shadow-sticker lg:rounded-[2.75rem]"
         animate={{
           background: unlocked
             ? "linear-gradient(135deg, #ff4d7d, #ffd9e3)"
@@ -809,7 +854,7 @@ function GiftMiniGame() {
         }}
         transition={{ duration: 0.24 }}
       >
-        <div className={`relative grid min-h-[520px] place-items-center overflow-hidden rounded-[2.35rem] ${unlocked ? "bg-white" : "bg-pinkBrand"}`}>
+        <div className={`relative grid min-h-[440px] place-items-center overflow-hidden rounded-[1.55rem] sm:min-h-[520px] lg:rounded-[2.35rem] ${unlocked ? "bg-white" : "bg-pinkBrand"}`}>
           <div className="pointer-events-none absolute -left-20 -top-20 h-72 w-72 rounded-full bg-white/24 blur-2xl" />
           <div className="pointer-events-none absolute -bottom-24 right-16 h-80 w-80 rounded-full bg-white/18 blur-2xl" />
           {!unlocked && (
@@ -832,9 +877,9 @@ function GiftMiniGame() {
             <div className="mt-7 w-full max-w-md">
               <p className="mb-2 text-left text-xs font-black uppercase text-graphite/45">Промокод</p>
               <div className="flex items-center gap-3">
-                <p className="min-w-0 flex-1 rounded-full bg-pinkSoft px-6 py-4 text-center font-display text-2xl font-black uppercase text-pinkBrand">
+                <button type="button" onClick={copyPromo} className="min-h-14 min-w-0 flex-1 rounded-full bg-pinkSoft px-6 py-4 text-center font-display text-2xl font-black uppercase text-pinkBrand">
                   НАШИ10
-                </p>
+                </button>
                 <button
                   type="button"
                   onClick={copyPromo}
@@ -862,7 +907,7 @@ function GiftMiniGame() {
                     animate={{ scale: [1, 1.04, 1] }}
                     transition={{ repeat: Infinity, duration: 1.4 }}
                     onClick={() => setClicks((value) => Math.min(targetClicks, value + 1))}
-                    className="rounded-full bg-white px-16 py-8 font-display text-5xl font-black uppercase text-pinkBrand shadow-paper"
+                    className="min-h-24 rounded-full bg-white px-14 py-7 font-display text-5xl font-black uppercase text-pinkBrand shadow-paper sm:px-16 sm:py-8"
                   >
                     Вау
                   </motion.button>
@@ -885,8 +930,8 @@ function EmotionReasons() {
   ] as const;
 
   return (
-    <section className="mx-auto max-w-7xl px-4 py-20 sm:px-6 lg:px-8">
-      <div className="rounded-[2.5rem] bg-graphite p-6 text-white shadow-paper sm:p-9">
+    <section className="mx-auto max-w-7xl px-4 py-[clamp(3.5rem,12vw,5rem)] sm:px-6 lg:px-8 lg:py-20">
+      <div className="rounded-[1.8rem] bg-graphite p-5 text-white shadow-paper sm:p-9 lg:rounded-[2.5rem]">
         <p className="font-black uppercase text-pinkSoft">Не про печать. Про ощущение.</p>
         <h2 className="mt-2 max-w-4xl font-display text-4xl font-black uppercase sm:text-6xl">Почему это работает эмоционально</h2>
         <div className="mt-10 grid gap-5 md:grid-cols-3">
@@ -908,12 +953,12 @@ function EmotionReasons() {
 function CompactFAQ() {
   const [open, setOpen] = useState(0);
   return (
-    <section className="mx-auto max-w-4xl px-4 py-20 sm:px-6 lg:px-8">
+    <section className="mx-auto max-w-4xl px-4 py-[clamp(3.5rem,12vw,5rem)] sm:px-6 lg:px-8 lg:py-20">
       <h2 className="font-display text-4xl font-black uppercase sm:text-6xl">Коротко</h2>
       <div className="mt-8 space-y-3">
         {faqItems.map(([question, answer], index) => (
           <div key={question} className="rounded-[1.5rem] bg-white shadow-paper">
-            <button onClick={() => setOpen(open === index ? -1 : index)} className="flex w-full items-center justify-between gap-4 p-5 text-left font-display text-xl font-black uppercase">
+            <button onClick={() => setOpen(open === index ? -1 : index)} className="flex min-h-16 w-full items-center justify-between gap-4 p-5 text-left font-display text-lg font-black uppercase sm:text-xl">
               {question}
               <motion.span animate={{ rotate: open === index ? 180 : 0 }} className="text-pinkBrand">
                 <ChevronDown />
@@ -987,10 +1032,10 @@ function QuickOrder({
   }
 
   return (
-    <section id="ver2-order" className="mx-auto grid max-w-7xl gap-8 px-4 py-20 sm:px-6 lg:grid-cols-[0.8fr_1.2fr] lg:px-8">
-      <div className="rounded-[2.5rem] bg-graphite p-7 text-white shadow-paper">
+    <section id="ver2-order" className="mx-auto grid max-w-7xl gap-8 px-4 pb-28 pt-[clamp(3.5rem,12vw,5rem)] sm:px-6 lg:grid-cols-[0.8fr_1.2fr] lg:px-8 lg:py-20">
+      <div className="rounded-[1.8rem] bg-graphite p-5 text-white shadow-paper sm:p-7 lg:rounded-[2.5rem]">
         <p className="font-black uppercase text-pinkSoft">Форма заявки</p>
-        <h2 className="mt-3 font-display text-5xl font-black uppercase">Что печатаем?</h2>
+        <h2 className="mt-3 font-display text-4xl font-black uppercase sm:text-5xl">Что печатаем?</h2>
         <p className="mt-6 text-lg font-bold text-white/70">Не знаете формат и бумагу? Ничего страшного. Напишите идею — подскажем лучший вариант.</p>
         <motion.div animate={copiedToForm ? { scale: [1, 1.04, 1], rotate: [-1, 2, 0] } : {}} className="peeled mt-8 rounded-3xl bg-pinkBrand p-5 shadow-sticker">
           <p className="text-sm font-black uppercase">Из конструктора</p>
@@ -998,7 +1043,7 @@ function QuickOrder({
           <p className="mt-3 font-display text-4xl font-black">{formatRub(price)}</p>
         </motion.div>
       </div>
-      <form onSubmit={submit} className="rounded-[2.5rem] bg-white p-5 shadow-paper sm:p-7">
+      <form onSubmit={submit} className="rounded-[1.8rem] bg-white p-5 shadow-paper sm:p-7 lg:rounded-[2.5rem]">
         <div className="grid gap-4 md:grid-cols-2">
           <input name="name" required minLength={2} className="field" placeholder="Имя" />
           <input name="contact" required minLength={6} className="field" placeholder="Телефон / Telegram / WhatsApp" />
@@ -1010,7 +1055,7 @@ function QuickOrder({
           <FileImage />
         </label>
         <textarea name="comment" className="field mt-4 min-h-24 resize-y" placeholder="Комментарий, срок, пожелания" />
-        <button className="magnetic mt-5 inline-flex w-full items-center justify-center gap-2 rounded-full bg-pinkBrand px-7 py-4 font-black uppercase text-white shadow-sticker md:w-auto">
+        <button className="magnetic mt-5 inline-flex min-h-12 w-full items-center justify-center gap-2 rounded-full bg-pinkBrand px-7 py-4 font-black uppercase text-white shadow-sticker md:w-auto">
           <Send size={20} /> Отправить заявку
         </button>
         <AnimatePresence>
@@ -1048,5 +1093,24 @@ function Chip({ active, onClick, children }: { active: boolean; onClick: () => v
       {active && <Check className="mr-2 inline" size={16} />}
       {children}
     </motion.button>
+  );
+}
+
+function MobileBottomCTA() {
+  return (
+    <nav className="fixed inset-x-3 bottom-3 z-[90] grid grid-cols-3 gap-2 rounded-[1.25rem] border border-white/70 bg-white/92 p-2 shadow-paper backdrop-blur md:hidden mobile-safe-cta">
+      <a href="#ver2-builder" className="flex min-h-12 flex-col items-center justify-center rounded-2xl bg-pinkBrand px-2 text-[11px] font-black uppercase text-white">
+        <ShoppingBag size={18} />
+        Заказать
+      </a>
+      <a href="#ver2-gallery" className="flex min-h-12 flex-col items-center justify-center rounded-2xl bg-pinkSoft px-2 text-[11px] font-black uppercase text-pinkBrand">
+        <Rows3 size={18} />
+        Работы
+      </a>
+      <a href="#ver2-products" className="flex min-h-12 flex-col items-center justify-center rounded-2xl bg-graphite px-2 text-[11px] font-black uppercase text-white">
+        <Wrench size={18} />
+        Услуги
+      </a>
+    </nav>
   );
 }
