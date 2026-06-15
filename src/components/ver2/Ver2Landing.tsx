@@ -109,40 +109,35 @@ const tapeCards = [
     description: "Персональная раскраска по фотографиям ребёнка, семьи или любимого момента.",
     price: "от 1000 ₽",
     category: "Раскраски",
-    image: "/images/tape/tape-coloring.jpeg",
-    desktopSize: "lg:h-[470px] lg:w-[420px]"
+    image: "/images/tape/tape-coloring.jpeg"
   },
   {
     title: "Фото на документы",
     description: "Фото 3x4 и 3,5x4,5 для документов.",
     price: "от 300 ₽",
     category: "Фото",
-    image: "/images/tape/tape-doc-photo.jpeg",
-    desktopSize: "lg:h-[520px] lg:w-[330px]"
+    image: "/images/tape/tape-doc-photo.jpeg"
   },
   {
     title: "Визитки",
     description: "Аккуратные визитки для себя, мастера или малого бизнеса.",
     price: "от 500 ₽",
     category: "Визитки",
-    image: "/images/tape/tape-business-cards.jpeg",
-    desktopSize: "lg:h-[390px] lg:w-[560px]"
+    image: "/images/tape/tape-business-cards.jpeg"
   },
   {
     title: "Открытки",
     description: "Открытки для подарков, праздников и тёплых слов.",
     price: "от 200 ₽",
     category: "Открытки",
-    image: "/images/tape/tape-postcards.jpeg",
-    desktopSize: "lg:h-[470px] lg:w-[380px]"
+    image: "/images/tape/tape-postcards.jpeg"
   },
   {
     title: "Документы",
     description: "Печать документов, анкет, файлов и учебных материалов.",
     price: "от 100 ₽",
     category: "Документы",
-    image: "/images/tape/tape-documents.jpeg",
-    desktopSize: "lg:h-[410px] lg:w-[520px]"
+    image: "/images/tape/tape-documents.jpeg"
   }
 ] as const;
 
@@ -249,7 +244,7 @@ export default function Ver2Landing() {
       onPointerMove={(event) => setCursor({ x: event.clientX, y: event.clientY })}
     >
       <div
-        className="cursor-glow pointer-events-none fixed left-0 top-0 z-[80] hidden h-72 w-72 rounded-full blur-xl lg:block"
+        className="cursor-glow pointer-events-none fixed left-0 top-0 z-[80] hidden h-72 w-72 rounded-full lg:block"
         style={{ transform: `translate3d(${cursor.x - 144}px, ${cursor.y - 144}px, 0)` }}
       />
       <HeroScene />
@@ -337,16 +332,13 @@ function ProcessReels() {
                 <Play size={18} fill="currentColor" />
               </span>
             </div>
-            <div className="absolute inset-x-4 bottom-4 rounded-2xl border border-white/70 bg-white/95 p-4 shadow-paper backdrop-blur">
+            <div className="absolute inset-x-4 bottom-4 rounded-2xl border border-white/70 bg-white p-4 shadow-paper">
               <h3 className="font-display text-xl font-black uppercase text-graphite">{video.title}</h3>
               <p className="mt-1 text-sm font-black text-graphite/75">{video.caption}</p>
             </div>
           </motion.article>
         ))}
       </div>
-      <p className="mt-2 text-sm font-bold text-graphite/45 max-md:hidden">
-        Наведите курсор на карточку — и процесс оживет.
-      </p>
     </section>
   );
 }
@@ -365,10 +357,9 @@ function HeroScene() {
       <div className="absolute inset-0 -z-10 bg-gradient-to-br from-white/95 via-white/68 to-pinkSoft/76" />
       <div className="absolute inset-x-0 bottom-0 -z-10 h-48 bg-gradient-to-t from-milk to-transparent" />
       <CloudPlayground />
-      <div className="pointer-events-none absolute left-[7%] top-28 z-10 h-16 w-24 rotate-[-10deg] rounded-2xl bg-white/82 shadow-paper backdrop-blur md:hidden" />
-      <div className="pointer-events-none absolute right-[-12px] top-48 z-10 h-24 w-20 rotate-[12deg] rounded-[1.5rem] bg-pinkSoft/82 shadow-paper md:hidden" />
-      <div className="pointer-events-none absolute bottom-28 left-[-18px] z-10 h-20 w-20 rounded-full bg-pinkBrand/20 blur-sm md:hidden" />
-      <nav className="relative z-50 mx-auto flex max-w-7xl items-center justify-between rounded-full bg-white/86 px-3 py-3 shadow-paper backdrop-blur sm:px-5 sm:py-4">
+      <div className="pointer-events-none absolute left-[7%] top-28 z-10 h-16 w-24 rotate-[-10deg] rounded-2xl bg-white shadow-paper md:hidden" />
+      <div className="pointer-events-none absolute right-[-12px] top-48 z-10 h-24 w-20 rotate-[12deg] rounded-[1.5rem] bg-pinkSoft shadow-paper md:hidden" />
+      <nav className="fixed inset-x-4 top-4 z-[100] mx-auto flex max-w-7xl items-center justify-between rounded-full bg-white px-3 py-3 shadow-paper sm:px-5 sm:py-4">
         <a href="/" className="relative h-11 w-[min(54vw,16rem)] overflow-hidden sm:h-14 sm:w-64" aria-label="Наша печать">
           <Image src="/brand/logos/logo-wide-alt.svg" alt="Наша печать" fill className="object-contain object-left" priority />
         </a>
@@ -383,7 +374,7 @@ function HeroScene() {
       </nav>
 
       <div className="relative z-20 mx-auto flex min-h-[calc(92svh-6rem)] max-w-7xl items-center justify-center py-[clamp(3.5rem,14vw,5rem)] text-center lg:min-h-[calc(100vh-7.5rem)] lg:py-20">
-        <div className="pointer-events-none select-none">
+        <div className="select-none">
           <div className="space-y-2 overflow-hidden font-display text-[clamp(2.35rem,12.5vw,7.4rem)] font-black uppercase leading-[0.9] tracking-normal sm:text-[clamp(3rem,7.6vw,7.4rem)]">
             {["Печатаем смело.", "Делаем красиво."].map((line, index) => (
               <motion.h1
@@ -530,7 +521,7 @@ function CloudPlayground() {
   }
 
   return (
-    <div ref={containerRef} className="absolute inset-0 z-40 hidden overflow-hidden lg:block">
+    <div ref={containerRef} className="pointer-events-none absolute inset-0 z-40 hidden overflow-hidden lg:block">
       {blobs.map((blob) => (
         <div
           key={blob.id}
@@ -580,7 +571,7 @@ function CloudPlayground() {
               vy: Math.abs(current.vy) < 0.28 ? (blob.id % 3 ? -0.72 : 0.72) : current.vy
             });
           }}
-          className="cloud-blob absolute grid cursor-grab select-none place-items-center px-8 text-center text-sm font-black uppercase text-graphite transition-transform active:cursor-grabbing"
+          className="cloud-blob pointer-events-auto absolute grid cursor-grab select-none place-items-center px-8 text-center text-sm font-black uppercase text-graphite transition-transform active:cursor-grabbing"
           style={{
             width: blob.w,
             height: blob.h,
@@ -598,7 +589,6 @@ function CloudPlayground() {
 
 function ColoringSlider() {
   const [position, setPosition] = useState(58);
-  const mode = position < 50 ? "Фото" : "Раскраска";
 
   return (
     <section className="mx-auto grid max-w-7xl gap-8 px-4 py-[clamp(3.5rem,12vw,5rem)] sm:px-6 lg:grid-cols-[0.75fr_1.25fr] lg:px-8 lg:py-20">
@@ -637,20 +627,6 @@ function ColoringSlider() {
             value={position}
             onChange={(event) => setPosition(Number(event.target.value))}
           />
-          <div className="absolute left-1/2 top-4 z-30 flex -translate-x-1/2 rounded-full bg-white/90 p-1 shadow-paper backdrop-blur">
-            {(["Фото", "Раскраска"] as const).map((item) => (
-              <button
-                key={item}
-                type="button"
-                onClick={() => setPosition(item === "Фото" ? 10 : 90)}
-                className={`min-h-11 rounded-full px-4 py-3 text-xs font-black uppercase transition sm:px-5 ${
-                  mode === item ? "bg-pinkBrand text-white shadow-sticker" : "text-graphite/60"
-                }`}
-              >
-                {item}
-              </button>
-            ))}
-          </div>
         </div>
       </div>
     </section>
@@ -675,21 +651,23 @@ function HorizontalGallery({
       </div>
       <div ref={trackRef} className="mobile-snap mt-10 flex w-auto max-w-none items-end gap-4 overflow-x-auto px-4 pb-5 sm:px-6 lg:mt-12 lg:w-max lg:gap-5 lg:overflow-visible lg:px-8 lg:pb-0">
         {tapeCards.map((work, index) => (
-          <article key={`${work.title}-${index}`} className={`peeled group h-[min(72vh,500px)] w-[min(84vw,390px)] shrink-0 snap-center overflow-hidden rounded-[1.6rem] bg-white p-2 text-graphite shadow-sticker ${work.desktopSize} lg:rounded-[2rem] lg:p-3`}>
-            <div className="relative h-full overflow-hidden rounded-[1.25rem] lg:rounded-[1.5rem]">
-              <Image src={work.image} alt={work.title} fill className="object-cover transition duration-700 group-hover:scale-110" />
-              <div className="absolute inset-x-3 bottom-3 rounded-2xl bg-white/92 p-4 backdrop-blur sm:inset-x-4 sm:bottom-4">
-                <p className="text-xs font-black uppercase text-pinkBrand">{work.category}</p>
-                <h3 className="mt-1 font-display text-2xl font-black uppercase leading-none sm:text-3xl">{work.title}</h3>
-                <p className="mt-2 text-sm font-bold text-graphite/65">{work.description}</p>
-                <div className="mt-4 flex flex-wrap items-center gap-2">
-                  <span className="rounded-full bg-pinkSoft px-4 py-2 text-sm font-black uppercase text-pinkBrand">
-                    {work.price}
-                  </span>
-                  <a href="#ver2-builder" className="inline-flex min-h-11 items-center rounded-full bg-pinkBrand px-4 py-2 text-xs font-black uppercase text-white shadow-sticker">
-                    Рассчитать
-                  </a>
-                </div>
+          <article key={`${work.title}-${index}`} className="peeled group flex h-[500px] w-[min(84vw,360px)] shrink-0 snap-center flex-col overflow-hidden rounded-[1.6rem] bg-white p-3 text-graphite shadow-sticker lg:h-[540px] lg:w-[380px] lg:rounded-[2rem]">
+            <div className="relative h-[68%] overflow-hidden rounded-[1.25rem] bg-milk lg:rounded-[1.5rem]">
+              <Image src={work.image} alt={work.title} fill className="object-cover transition duration-700 group-hover:scale-105" />
+            </div>
+            <div className="flex min-h-0 flex-1 flex-col justify-between px-1 pb-1 pt-4">
+              <div>
+                <p className="text-[11px] font-black uppercase text-pinkBrand">{work.category}</p>
+                <h3 className="mt-1 font-display text-2xl font-black uppercase leading-none">{work.title}</h3>
+                <p className="mt-2 line-clamp-2 text-sm font-bold leading-snug text-graphite/62">{work.description}</p>
+              </div>
+              <div className="mt-3 flex flex-wrap items-center gap-2">
+                <span className="rounded-full bg-pinkSoft px-4 py-2 text-sm font-black uppercase text-pinkBrand">
+                  {work.price}
+                </span>
+                <a href="#ver2-builder" className="inline-flex min-h-10 items-center rounded-full bg-pinkBrand px-4 py-2 text-xs font-black uppercase text-white shadow-sticker">
+                  Рассчитать
+                </a>
               </div>
             </div>
           </article>
@@ -761,7 +739,7 @@ function OrderBuilder({
             </button>
           </div>
         </div>
-        <div className="mt-5 rounded-[1.5rem] bg-white/72 p-4 font-black text-graphite/60 shadow-paper backdrop-blur sm:mt-8 sm:rounded-[2rem] sm:p-5">
+        <div className="mt-5 rounded-[1.5rem] bg-white p-4 font-black text-graphite/60 shadow-paper sm:mt-8 sm:rounded-[2rem] sm:p-5">
           {helperText}
         </div>
       </div>
@@ -829,17 +807,15 @@ function GiftMiniGame() {
         transition={{ duration: 0.24 }}
       >
         <div className={`relative grid min-h-[440px] place-items-center overflow-hidden rounded-[1.55rem] sm:min-h-[520px] lg:rounded-[2.35rem] ${unlocked ? "bg-white" : "bg-pinkBrand"}`}>
-          <div className="pointer-events-none absolute -left-20 -top-20 h-72 w-72 rounded-full bg-white/24 blur-2xl" />
-          <div className="pointer-events-none absolute -bottom-24 right-16 h-80 w-80 rounded-full bg-white/18 blur-2xl" />
           {!unlocked && (
-            <div className="absolute right-7 top-7 rounded-full bg-white/18 px-5 py-3 font-display text-2xl font-black text-white backdrop-blur">
+            <div className="absolute right-7 top-7 rounded-full bg-white px-5 py-3 font-display text-2xl font-black text-pinkBrand shadow-paper">
               {progress}%
             </div>
           )}
           <motion.div
             initial={false}
             animate={unlocked ? { scale: 1, opacity: 1 } : { scale: 0.94, opacity: 0.16 }}
-            className="relative z-10 grid w-full max-w-xl place-items-center rounded-[2rem] bg-white/92 p-8 text-center shadow-paper backdrop-blur sm:p-10"
+            className="relative z-10 grid w-full max-w-xl place-items-center rounded-[2rem] bg-white p-8 text-center shadow-paper sm:p-10"
           >
             <div className="relative grid h-44 w-48 place-items-center rounded-[2rem] bg-pinkBrand text-white shadow-sticker">
               <Gift size={82} />
@@ -874,6 +850,28 @@ function GiftMiniGame() {
                 exit={{ y: "-105%", rotate: -2, opacity: 0 }}
                 transition={{ duration: 0.75, ease: [0.22, 1, 0.36, 1] }}
               >
+                <div className="absolute inset-x-8 top-8 h-4 overflow-hidden rounded-full bg-white/30 shadow-paper sm:inset-x-12">
+                  <motion.div
+                    className="h-full rounded-full bg-white"
+                    animate={{ width: `${progress}%` }}
+                    transition={{ duration: 0.18 }}
+                  />
+                </div>
+                <div className="pointer-events-none absolute inset-0">
+                  {[
+                    { show: progress >= 15, className: "left-[30%] top-[34%] h-28 rotate-[24deg]" },
+                    { show: progress >= 30, className: "left-[48%] top-[28%] h-36 rotate-[-18deg]" },
+                    { show: progress >= 45, className: "left-[58%] top-[47%] h-32 rotate-[38deg]" },
+                    { show: progress >= 60, className: "left-[40%] top-[55%] h-40 rotate-[-42deg]" },
+                    { show: progress >= 75, className: "left-[68%] top-[30%] h-24 rotate-[74deg]" },
+                    { show: progress >= 90, className: "left-[24%] top-[58%] h-24 rotate-[112deg]" }
+                  ].map((crack) => (
+                    <span
+                      key={crack.className}
+                      className={`absolute w-1 origin-top rounded-full bg-white shadow-paper transition duration-200 ${crack.show ? "scale-y-100 opacity-90" : "scale-y-0 opacity-0"} ${crack.className}`}
+                    />
+                  ))}
+                </div>
                 <div className="text-center">
                   <motion.button
                     type="button"
@@ -886,6 +884,14 @@ function GiftMiniGame() {
                     Вау
                   </motion.button>
                   <p className="mt-7 font-display text-4xl font-black text-white">{progress}%</p>
+                  <div className="mx-auto mt-4 grid max-w-xs grid-cols-10 gap-1">
+                    {Array.from({ length: 10 }).map((_, index) => (
+                      <span
+                        key={index}
+                        className={`h-2 rounded-full transition ${progress >= (index + 1) * 10 ? "bg-white" : "bg-white/28"}`}
+                      />
+                    ))}
+                  </div>
                 </div>
               </motion.div>
             )}
@@ -979,12 +985,12 @@ function Contacts() {
 
   return (
     <footer id="ver2-contacts" className="bg-graphite px-4 pb-28 pt-12 text-white sm:px-6 sm:pt-16 lg:px-8 lg:pb-12 lg:pt-20">
-      <div className="mx-auto max-w-7xl rounded-[1.8rem] border border-white/10 bg-white/8 p-5 shadow-paper backdrop-blur sm:p-8 lg:rounded-[2.5rem]">
+      <div className="mx-auto max-w-7xl rounded-[1.8rem] border border-white/10 bg-white p-5 text-graphite shadow-paper sm:p-8 lg:rounded-[2.5rem]">
         <div className="grid gap-6 lg:grid-cols-[0.85fr_1.15fr] lg:items-end">
           <div>
-            <p className="font-black uppercase text-pinkSoft">Контакты</p>
+            <p className="font-black uppercase text-pinkBrand">Контакты</p>
             <h2 className="mt-2 font-display text-4xl font-black uppercase sm:text-6xl">Напишите нам</h2>
-            <p className="mt-4 max-w-xl text-lg font-bold leading-relaxed text-white/70">
+            <p className="mt-4 max-w-xl text-lg font-bold leading-relaxed text-graphite/65">
               Напишите нам — подскажем по формату, цене и подготовке файлов.
             </p>
           </div>
@@ -1136,7 +1142,7 @@ function Chip({ active, onClick, children }: { active: boolean; onClick: () => v
 
 function MobileBottomCTA() {
   return (
-    <nav className="fixed inset-x-3 bottom-3 z-[90] grid grid-cols-3 gap-2 rounded-[1.25rem] border border-white/70 bg-white/92 p-2 shadow-paper backdrop-blur md:hidden mobile-safe-cta">
+    <nav className="fixed inset-x-3 bottom-3 z-[90] grid grid-cols-3 gap-2 rounded-[1.25rem] border border-white bg-white p-2 shadow-paper md:hidden mobile-safe-cta">
       <a href="#ver2-builder" className="flex min-h-12 flex-col items-center justify-center rounded-2xl bg-pinkBrand px-2 text-[11px] font-black uppercase text-white">
         <ShoppingBag size={18} />
         Заказать
