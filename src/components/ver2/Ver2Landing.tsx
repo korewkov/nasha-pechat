@@ -784,11 +784,7 @@ function GiftMiniGame() {
   const targetClicks = 18;
   const progress = Math.min(100, Math.round((clicks / targetClicks) * 100));
   const unlocked = progress >= 100;
-  const side = Math.min(100, progress * 4);
-  const top = Math.min(100, side);
-  const right = Math.min(100, Math.max(0, side - 100));
-  const bottom = Math.min(100, Math.max(0, side - 200));
-  const left = Math.min(100, Math.max(0, side - 300));
+  const progressAngle = progress * 3.6;
 
   async function copyPromo() {
     await navigator.clipboard?.writeText("НАШИ10");
@@ -804,76 +800,79 @@ function GiftMiniGame() {
           Добейте шкалу радости до конца — внутри спрятан подарок для первого заказа.
         </p>
       </div>
-      <div className="relative overflow-hidden rounded-[2.75rem] bg-pinkBrand p-4 shadow-sticker sm:p-6">
-        {!unlocked && (
-          <div className="pointer-events-none absolute inset-4 z-40 rounded-[2.1rem] sm:inset-6">
-            <motion.div className="absolute left-0 top-0 h-1.5 rounded-full bg-white" animate={{ width: `${top}%` }} />
-            <motion.div className="absolute right-0 top-0 w-1.5 rounded-full bg-white" animate={{ height: `${right}%` }} />
-            <motion.div className="absolute bottom-0 right-0 h-1.5 rounded-full bg-white" animate={{ width: `${bottom}%` }} />
-            <motion.div className="absolute bottom-0 left-0 w-1.5 rounded-full bg-white" animate={{ height: `${left}%` }} />
-          </div>
-        )}
-
-        <div className="relative grid min-h-[500px] place-items-center overflow-hidden rounded-[2.1rem] bg-white">
+      <motion.div
+        className="relative overflow-hidden rounded-[2.75rem] p-2 shadow-sticker"
+        animate={{
+          background: unlocked
+            ? "linear-gradient(135deg, #ff4d7d, #ffd9e3)"
+            : `conic-gradient(from -90deg, #ffffff ${progressAngle}deg, rgba(255,255,255,.25) ${progressAngle}deg 360deg)`
+        }}
+        transition={{ duration: 0.24 }}
+      >
+        <div className={`relative grid min-h-[520px] place-items-center overflow-hidden rounded-[2.35rem] ${unlocked ? "bg-white" : "bg-pinkBrand"}`}>
+          <div className="pointer-events-none absolute -left-20 -top-20 h-72 w-72 rounded-full bg-white/24 blur-2xl" />
+          <div className="pointer-events-none absolute -bottom-24 right-16 h-80 w-80 rounded-full bg-white/18 blur-2xl" />
+          {!unlocked && (
+            <div className="absolute right-7 top-7 rounded-full bg-white/18 px-5 py-3 font-display text-2xl font-black text-white backdrop-blur">
+              {progress}%
+            </div>
+          )}
           <motion.div
             initial={false}
-            animate={unlocked ? { scale: 1, opacity: 1 } : { scale: 0.9, opacity: 0.22 }}
-            className="relative z-10 grid place-items-center text-center"
+            animate={unlocked ? { scale: 1, opacity: 1 } : { scale: 0.94, opacity: 0.16 }}
+            className="relative z-10 grid w-full max-w-xl place-items-center rounded-[2rem] bg-white/92 p-8 text-center shadow-paper backdrop-blur sm:p-10"
           >
-            <div className="relative grid h-48 w-52 place-items-center rounded-[2rem] bg-pinkBrand text-white shadow-sticker">
+            <div className="relative grid h-44 w-48 place-items-center rounded-[2rem] bg-pinkBrand text-white shadow-sticker">
               <Gift size={82} />
               <div className="absolute left-1/2 top-0 h-full w-8 -translate-x-1/2 bg-white/25" />
               <div className="absolute left-0 top-1/2 h-8 w-full -translate-y-1/2 bg-white/25" />
             </div>
             <p className="mt-7 font-display text-4xl font-black uppercase text-graphite">Скидка 10%</p>
             <p className="mt-2 text-lg font-black text-graphite/62">на первый заказ</p>
-            <div className="mt-5 flex items-center gap-2 rounded-full bg-pinkSoft px-4 py-3">
-              <p className="font-display text-xl font-black uppercase text-pinkBrand sm:text-2xl">Промокод: НАШИ10</p>
-              <button
-                type="button"
-                onClick={copyPromo}
-                className="grid h-10 w-10 shrink-0 place-items-center rounded-full bg-white text-pinkBrand shadow-paper transition hover:bg-graphite hover:text-white"
-                aria-label="Скопировать промокод"
-              >
-                <Copy size={18} />
-              </button>
+            <div className="mt-7 w-full max-w-md">
+              <p className="mb-2 text-left text-xs font-black uppercase text-graphite/45">Промокод</p>
+              <div className="flex items-center gap-3">
+                <p className="min-w-0 flex-1 rounded-full bg-pinkSoft px-6 py-4 text-center font-display text-2xl font-black uppercase text-pinkBrand">
+                  НАШИ10
+                </p>
+                <button
+                  type="button"
+                  onClick={copyPromo}
+                  className="grid h-14 w-14 shrink-0 place-items-center rounded-full bg-graphite text-white shadow-paper transition hover:bg-pinkBrand"
+                  aria-label="Скопировать промокод"
+                >
+                  <Copy size={20} />
+                </button>
+              </div>
+              {copied && <p className="mt-3 text-left text-sm font-black uppercase text-pinkBrand">Скопировано</p>}
             </div>
-            {copied && <p className="mt-3 text-sm font-black uppercase text-pinkBrand">Скопировано</p>}
           </motion.div>
 
           <AnimatePresence>
             {!unlocked && (
-              <>
-                <motion.div
-                  className="absolute inset-y-0 left-0 z-20 w-1/2 origin-left bg-pinkBrand"
-                  exit={{ x: "-115%", rotate: -9, opacity: 0 }}
-                  transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
-                />
-                <motion.div
-                  className="absolute inset-y-0 right-0 z-20 w-1/2 origin-right bg-pinkBrand"
-                  exit={{ x: "115%", rotate: 9, opacity: 0 }}
-                  transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
-                />
-                <div className="absolute inset-0 z-30 grid place-items-center">
-                  <div className="text-center">
-                    <motion.button
-                      type="button"
-                      whileTap={{ scale: 0.88, rotate: -2 }}
-                      animate={{ scale: [1, 1.04, 1] }}
-                      transition={{ repeat: Infinity, duration: 1.4 }}
-                      onClick={() => setClicks((value) => Math.min(targetClicks, value + 1))}
-                      className="rounded-full bg-white px-16 py-8 font-display text-5xl font-black uppercase text-pinkBrand shadow-paper"
-                    >
-                      Вау
-                    </motion.button>
-                    <p className="mt-7 font-display text-4xl font-black text-white">{progress}%</p>
-                  </div>
+              <motion.div
+                className="absolute inset-0 z-30 grid place-items-center bg-pinkBrand"
+                exit={{ y: "-105%", rotate: -2, opacity: 0 }}
+                transition={{ duration: 0.75, ease: [0.22, 1, 0.36, 1] }}
+              >
+                <div className="text-center">
+                  <motion.button
+                    type="button"
+                    whileTap={{ scale: 0.88, rotate: -2 }}
+                    animate={{ scale: [1, 1.04, 1] }}
+                    transition={{ repeat: Infinity, duration: 1.4 }}
+                    onClick={() => setClicks((value) => Math.min(targetClicks, value + 1))}
+                    className="rounded-full bg-white px-16 py-8 font-display text-5xl font-black uppercase text-pinkBrand shadow-paper"
+                  >
+                    Вау
+                  </motion.button>
+                  <p className="mt-7 font-display text-4xl font-black text-white">{progress}%</p>
                 </div>
-              </>
+              </motion.div>
             )}
           </AnimatePresence>
         </div>
-      </div>
+      </motion.div>
     </section>
   );
 }
