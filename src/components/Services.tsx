@@ -38,6 +38,9 @@ export default function Services() {
                 <Icon size={30} strokeWidth={2.8} />
               </motion.div>
               <h3 className="font-display text-2xl font-black uppercase text-graphite">{service.title}</h3>
+              <p className="mt-3 inline-flex rounded-full bg-pinkSoft px-4 py-2 text-sm font-black uppercase text-pinkBrand">
+                {service.price}
+              </p>
               <p className="mt-3 text-base font-semibold leading-relaxed text-graphite/65">{service.text}</p>
             </motion.article>
           );

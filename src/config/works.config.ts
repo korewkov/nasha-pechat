@@ -3,18 +3,16 @@ export type WorkCategory =
   | "Раскраски"
   | "Фото"
   | "Визитки"
-  | "Стикеры"
   | "Открытки"
-  | "Упаковка";
+  | "Документы";
 
 export const workCategories: WorkCategory[] = [
   "Все",
   "Раскраски",
   "Фото",
   "Визитки",
-  "Стикеры",
   "Открытки",
-  "Упаковка"
+  "Документы"
 ];
 
 export const works = [
@@ -37,27 +35,21 @@ export const works = [
     image: "/works/business-1.jpg"
   },
   {
-    title: "Набор стикеров",
-    description: "Яркие наклейки для упаковки и подарочных наборов.",
-    category: "Стикеры",
-    image: "/works/stickers-1.jpg"
-  },
-  {
     title: "Спасибо-карточка",
     description: "Маленький печатный жест, который запоминают.",
     category: "Открытки",
     image: "/works/card-1.jpg"
   },
   {
-    title: "Упаковочные вкладыши",
-    description: "Наклейки, бирки и вкладыши в едином стиле.",
-    category: "Упаковка",
-    image: "/works/packaging-1.jpg"
+    title: "Печать документов",
+    description: "Файлы, анкеты и учебные материалы в аккуратной стопке.",
+    category: "Документы",
+    image: "/works/printing-1.jpg"
   },
   {
     title: "Мини-тираж документов",
     description: "Печать, ламинация и сборка небольших партий.",
-    category: "Фото",
+    category: "Документы",
     image: "/works/printing-1.jpg"
   },
   {
@@ -77,8 +69,8 @@ export const reviews = [
   },
   {
     name: "Анна",
-    service: "Стикеры",
-    text: "Mock data: помогли подобрать бумагу и напечатали наклейки для упаковки красиво и ровно.",
+    service: "Открытки",
+    text: "Mock data: помогли подобрать бумагу и напечатали открытки красиво и ровно.",
     rating: 5
   },
   {

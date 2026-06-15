@@ -1,47 +1,50 @@
 import {
-  BadgeCheck,
   BookOpen,
   Camera,
   Files,
   Gift,
-  IdCard,
-  Sparkles
+  IdCard
 } from "lucide-react";
 
 export const services = [
   {
-    title: "Раскраски по фото",
+    title: "Раскраска по фото",
+    price: "от 1000 ₽",
     text: "Персональные книжки-раскраски по вашим фотографиям.",
-    icon: BookOpen
+    icon: BookOpen,
+    image: "/works/optimized/coloring-1.jpg",
+    assetPath: "/images/services/coloring-book.jpg"
   },
   {
     title: "Фото на документы",
+    price: "от 300 ₽",
     text: "Аккуратная подготовка и печать фото.",
-    icon: Camera
+    icon: Camera,
+    image: "/works/optimized/photo-1.jpg",
+    assetPath: "/images/services/document-photo.jpg"
   },
   {
-    title: "Визитки и карточки",
+    title: "Визитки",
+    price: "от 500 ₽",
     text: "Для бизнеса, мастеров, специалистов и проектов.",
-    icon: IdCard
+    icon: IdCard,
+    image: "/works/optimized/business-1.jpg",
+    assetPath: "/images/services/business-cards.jpg"
   },
   {
-    title: "Стикеры и наклейки",
-    text: "Для упаковки, подарков, брендов и мероприятий.",
-    icon: Sparkles
-  },
-  {
-    title: "Открытки и вкладыши",
+    title: "Открытки",
+    price: "от 200 ₽",
     text: "Спасибо-карточки, поздравления, мини-подарки.",
-    icon: Gift
+    icon: Gift,
+    image: "/works/optimized/card-1.jpg",
+    assetPath: "/images/services/postcards.jpg"
   },
   {
-    title: "Печать и ламинация",
+    title: "Документы",
+    price: "от 100 ₽",
     text: "Документы, материалы, мини-тиражи.",
-    icon: Files
-  },
-  {
-    title: "Проверка макета",
-    text: "Подскажем, что поправить перед печатью.",
-    icon: BadgeCheck
+    icon: Files,
+    image: "/works/optimized/printing-1.jpg",
+    assetPath: "/images/services/documents-print.jpg"
   }
 ];

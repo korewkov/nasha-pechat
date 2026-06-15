@@ -17,6 +17,7 @@ export const orderSchema = z.object({
   urgency: z.enum(["стандартно", "срочно"]),
   description: z.string().trim().min(8, "Опишите заказ чуть подробнее"),
   estimatedPrice: z.coerce.number().min(0).max(500000),
+  promoCode: z.string().trim().max(80).optional().default(""),
   comment: z.string().trim().max(800).optional().default(""),
   consent: z.boolean().refine(Boolean, "Нужно согласие на обработку данных"),
   website: z.string().max(0).optional().default("")

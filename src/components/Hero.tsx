@@ -100,7 +100,7 @@ export default function Hero() {
           >
             <Image
               src="/generated/hero-print-products.png"
-              alt="Мокап печатной продукции: визитки, стикеры, открытки и упаковка"
+              alt="Мокап печатной продукции: визитки, открытки и документы"
               width={1400}
               height={900}
               className="h-[420px] rounded-[1.7rem] object-cover sm:h-[500px]"

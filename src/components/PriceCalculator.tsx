@@ -9,8 +9,8 @@ import type { CalculatorState } from "@/components/LandingPage";
 import {
   calculateOrderPrice,
   extraOptions,
-  formats,
   paperTypes,
+  serviceFormatOptions,
   serviceTypes,
   type ExtraOption
 } from "@/config/pricing.config";
@@ -24,6 +24,7 @@ export default function PriceCalculator({
   onChange: (next: CalculatorState) => void;
 }) {
   const price = calculateOrderPrice(value);
+  const availableFormats = serviceFormatOptions[value.service];
 
   useEffect(() => {
     if (value.total !== price.total) {
@@ -46,21 +47,31 @@ export default function PriceCalculator({
       <div className="mb-10">
         <p className="font-black uppercase text-pinkBrand">Калькулятор стоимости</p>
         <h2 className="mt-2 max-w-4xl font-display text-4xl font-black uppercase text-graphite sm:text-6xl">
-          Соберите заказ как набор ярких стикеров
+          Соберите заказ и получите ориентир по стоимости
         </h2>
       </div>
       <div className="grid gap-6 lg:grid-cols-[1.2fr_0.8fr]">
         <div className="rounded-[2rem] border border-graphite/10 bg-white p-5 shadow-paper sm:p-7">
           <OptionGroup title="Тип услуги">
             {serviceTypes.map((item) => (
-              <Pill key={item} active={value.service === item} onClick={() => patch({ service: item })}>
+              <Pill
+                key={item}
+                active={value.service === item}
+                onClick={() => {
+                  const nextFormats = serviceFormatOptions[item];
+                  patch({
+                    service: item,
+                    format: nextFormats.includes(value.format) ? value.format : nextFormats[0]
+                  });
+                }}
+              >
                 {item}
               </Pill>
             ))}
           </OptionGroup>
 
           <OptionGroup title="Формат">
-            {formats.map((item) => (
+            {availableFormats.map((item) => (
               <Pill key={item} active={value.format === item} onClick={() => patch({ format: item })}>
                 {item}
               </Pill>
@@ -109,7 +120,7 @@ export default function PriceCalculator({
           <div className="relative mt-5 h-40 overflow-hidden rounded-3xl border border-white/10">
             <Image
               src="/generated/order-stack.png"
-              alt="Стопка печатного заказа с карточками и стикерами"
+              alt="Стопка печатного заказа с карточками и документами"
               fill
               className="object-cover"
             />

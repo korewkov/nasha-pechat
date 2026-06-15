@@ -2,14 +2,20 @@ export const serviceTypes = [
   "Раскраска по фото",
   "Фото на документы",
   "Визитки",
-  "Стикеры",
   "Открытки",
-  "Ламинация",
-  "Печать документов",
+  "Документы",
   "Другое"
 ] as const;
 
 export const formats = ["A6", "A5", "A4", "10x15", "3x4", "3,5x4,5", "свой размер"] as const;
+export const serviceFormatOptions: Record<ServiceType, PrintFormat[]> = {
+  "Раскраска по фото": ["A5", "A4"],
+  "Фото на документы": ["3x4", "3,5x4,5"],
+  "Визитки": ["A6", "свой размер"],
+  "Открытки": ["A6", "A5", "10x15", "свой размер"],
+  "Документы": ["A5", "A4"],
+  "Другое": ["A6", "A5", "A4", "10x15", "3x4", "3,5x4,5", "свой размер"]
+};
 
 export const paperTypes = [
   "обычная",
@@ -31,13 +37,11 @@ export const extraOptions = [
 
 export const pricingConfig = {
   services: {
-    "Раскраска по фото": 650,
-    "Фото на документы": 250,
-    "Визитки": 900,
-    "Стикеры": 450,
-    "Открытки": 350,
-    "Ламинация": 120,
-    "Печать документов": 35,
+    "Раскраска по фото": 1000,
+    "Фото на документы": 300,
+    "Визитки": 500,
+    "Открытки": 200,
+    "Документы": 100,
     "Другое": 300
   },
   formats: {
@@ -84,6 +88,31 @@ export function calculateOrderPrice(input: {
   paper: PaperType;
   extras: ExtraOption[];
 }) {
+  if (input.service === "Раскраска по фото") {
+    const isA4 = input.format === "A4";
+    const base = isA4 ? 1500 : 1000;
+    const extraPhotoPrice = isA4 ? 150 : 100;
+    const photos = Math.max(1, input.quantity);
+    const extraPhotos = Math.max(0, photos - 5);
+    const extras = input.extras.reduce((sum, option) => sum + pricingConfig.extras[option], 0);
+
+    return {
+      base: base + extraPhotos * extraPhotoPrice,
+      extras,
+      total: base + extraPhotos * extraPhotoPrice + extras
+    };
+  }
+
+  if (input.service === "Фото на документы") {
+    const extras = input.extras.reduce((sum, option) => sum + pricingConfig.extras[option], 0);
+
+    return {
+      base: 300,
+      extras,
+      total: 300 + extras
+    };
+  }
+
   const basePerItem =
     pricingConfig.services[input.service] *
     pricingConfig.formats[input.format] *

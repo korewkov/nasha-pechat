@@ -10,10 +10,13 @@ import {
   Check,
   ChevronDown,
   Copy,
+  ExternalLink,
   FileImage,
   Gift,
   Heart,
+  Mail,
   Minus,
+  Phone,
   Play,
   Plus,
   Rows3,
@@ -24,55 +27,58 @@ import {
 } from "lucide-react";
 import {
   calculateOrderPrice,
+  serviceFormatOptions,
   type ExtraOption,
   type PaperType,
   type PrintFormat,
   type ServiceType
 } from "@/config/pricing.config";
-import { works } from "@/config/works.config";
 import { formatRub } from "@/lib/utils";
 
 const products = [
   {
     short: "Раскраска",
     service: "Раскраска по фото",
+    price: "от 1000 ₽",
     line: "Фото превращаем в книжку.",
     image: "/works/optimized/coloring-1.jpg",
+    assetPath: "/images/services/coloring-book.jpg",
     move: "group-hover:[transform:rotate(-3deg)_translateY(-10px)]"
   },
   {
     short: "Фото",
     service: "Фото на документы",
+    price: "от 300 ₽",
     line: "Ровно, чисто, по формату.",
     image: "/works/optimized/photo-1.jpg",
+    assetPath: "/images/services/document-photo.jpg",
     move: "group-hover:brightness-110"
-  },
-  {
-    short: "Стикеры",
-    service: "Стикеры",
-    line: "Для упаковки и подарков.",
-    image: "/works/optimized/stickers-1.jpg",
-    move: "group-hover:[transform:rotate(4deg)_scale(1.05)]"
   },
   {
     short: "Визитки",
     service: "Визитки",
+    price: "от 500 ₽",
     line: "Карточки, которые держат стиль.",
     image: "/works/optimized/business-1.jpg",
+    assetPath: "/images/services/business-cards.jpg",
     move: "group-hover:[transform:translateX(10px)_rotate(2deg)]"
   },
   {
     short: "Открытки",
     service: "Открытки",
+    price: "от 200 ₽",
     line: "Спасибо, праздник, вау.",
     image: "/works/optimized/card-1.jpg",
+    assetPath: "/images/services/postcards.jpg",
     move: "group-hover:[transform:rotate(-2deg)_scale(1.04)]"
   },
   {
     short: "Документы",
-    service: "Печать документов",
+    service: "Документы",
+    price: "от 100 ₽",
     line: "Печать, сборка, ламинация.",
     image: "/works/optimized/printing-1.jpg",
+    assetPath: "/images/services/documents-print.jpg",
     move: "group-hover:[transform:translateY(-12px)]"
   }
 ] as const;
@@ -80,18 +86,16 @@ const products = [
 const serviceMap: Record<string, ServiceType> = {
   Раскраска: "Раскраска по фото",
   Фото: "Фото на документы",
-  Стикеры: "Стикеры",
   Визитки: "Визитки",
   Открытки: "Открытки",
-  Документы: "Печать документов"
+  Документы: "Документы"
 };
 
-const formatOptions: PrintFormat[] = ["A6", "A5", "A4", "10x15", "свой размер"];
 const faqItems = [
   ["Можно одну штуку?", "Да. Печатаем маленькие заказы без неловкости."],
   ["Можно без макета?", "Да. Напишите идею, подскажем формат и подготовку."],
   ["Сколько стоит?", "Калькулятор даст ориентир. Точно скажем после проверки."],
-  ["Как передать фото?", "Через Telegram, WhatsApp или ссылкой на облако."],
+  ["Как передать фото?", "Фото можно передать через Telegram, MAX, ВКонтакте или отправить на электронную почту. После заявки подскажем самый удобный способ и поможем с файлами."],
   ["Можно срочно?", "Если есть окно в графике, сделаем быстрее."]
 ] as const;
 
@@ -109,10 +113,10 @@ const reelVideos = [
     poster: "/works/optimized/printing-1.jpg"
   },
   {
-    title: "Стикеры и резка",
-    caption: "Отклеивается как надо",
+    title: "Фото на документы",
+    caption: "Ровный размер и чистая печать",
     src: "/reels/optimized/process-3.mp4",
-    poster: "/works/optimized/stickers-1.jpg"
+    poster: "/works/optimized/photo-1.jpg"
   },
   {
     title: "Упаковка заказа",
@@ -141,12 +145,55 @@ const initialBuilder: BuilderState = {
   product: "Раскраска",
   service: "Раскраска по фото",
   format: "A5",
-  quantity: 12,
+  quantity: 5,
   paper: "плотная матовая",
   extras: []
 };
 
-const cloudLabels = ["Раскраска", "Стикеры", "Визитки", "Открытки", "Фото", "Ламинация"] as const;
+const cloudLabels = ["Раскраска", "Фото", "Визитки", "Открытки", "Документы", "Макеты"] as const;
+
+const tapeCards = [
+  {
+    title: "Персональная раскраска",
+    description: "Раскраска по фото ребёнка, семьи или любимого момента",
+    category: "Раскраски",
+    image: "/works/optimized/coloring-1.jpg",
+    assetPath: "/images/tape/tape-coloring.jpg",
+    desktopSize: "lg:h-[470px] lg:w-[420px]"
+  },
+  {
+    title: "Фото на документы",
+    description: "Фото 3x4 и 3,5x4,5 для документов",
+    category: "Фото",
+    image: "/works/optimized/photo-1.jpg",
+    assetPath: "/images/tape/tape-doc-photo.jpg",
+    desktopSize: "lg:h-[520px] lg:w-[330px]"
+  },
+  {
+    title: "Визитки",
+    description: "Аккуратные визитки для себя, мастера или малого бизнеса",
+    category: "Визитки",
+    image: "/works/optimized/business-1.jpg",
+    assetPath: "/images/tape/tape-business-cards.jpg",
+    desktopSize: "lg:h-[390px] lg:w-[560px]"
+  },
+  {
+    title: "Открытки",
+    description: "Открытки для подарков, праздников и тёплых слов",
+    category: "Открытки",
+    image: "/works/optimized/card-1.jpg",
+    assetPath: "/images/tape/tape-postcards.jpg",
+    desktopSize: "lg:h-[470px] lg:w-[380px]"
+  },
+  {
+    title: "Печать документов",
+    description: "Распечатка документов, файлов, анкет и учебных материалов",
+    category: "Документы",
+    image: "/works/optimized/printing-1.jpg",
+    assetPath: "/images/tape/tape-documents.jpg",
+    desktopSize: "lg:h-[410px] lg:w-[520px]"
+  }
+] as const;
 
 type CloudItem = {
   id: number;
@@ -163,10 +210,6 @@ type CloudItem = {
   lastY: number;
   phase: number;
 };
-
-function optimizedWorkImage(path: string) {
-  return path.replace("/works/", "/works/optimized/");
-}
 
 export default function Ver2Landing() {
   const galleryRef = useRef<HTMLDivElement>(null);
@@ -230,7 +273,17 @@ export default function Ver2Landing() {
   }
 
   function chooseProduct(product: keyof typeof serviceMap) {
-    setBuilder((current) => ({ ...current, product, service: serviceMap[product] }));
+    setBuilder((current) => {
+      const service = serviceMap[product];
+      const availableFormats = serviceFormatOptions[service];
+      return {
+        ...current,
+        product,
+        service,
+        format: availableFormats.includes(current.format) ? current.format : availableFormats[0],
+        quantity: service === "Раскраска по фото" ? Math.max(5, current.quantity) : current.quantity
+      };
+    });
   }
 
   function passToForm() {
@@ -263,6 +316,7 @@ export default function Ver2Landing() {
       <GiftMiniGame />
       <EmotionReasons />
       <CompactFAQ />
+      <Contacts />
       <QuickOrder builder={builder} price={price.total} copiedToForm={copiedToForm} />
       <MobileBottomCTA />
     </main>
@@ -316,7 +370,7 @@ function ProcessReels() {
             className="group relative aspect-[9/16] h-[min(68vh,520px)] min-h-[390px] w-[min(78vw,315px)] shrink-0 snap-center overflow-hidden rounded-[1.6rem] bg-graphite shadow-paper sm:w-[315px] lg:rounded-[2rem]"
           >
             <video
-              className="h-full w-full object-cover"
+              className="process-reel-video"
               src={video.src}
               poster={video.poster}
               muted
@@ -342,9 +396,6 @@ function ProcessReels() {
       </div>
       <p className="mt-2 text-sm font-bold text-graphite/45 max-md:hidden">
         Наведите курсор на карточку — и процесс оживет.
-      </p>
-      <p className="mt-2 text-sm font-bold text-graphite/45 md:hidden">
-        Нажмите на ролик, чтобы оживить процесс.
       </p>
     </section>
   );
@@ -402,7 +453,7 @@ function HeroScene() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.45 }}
           >
-            Раскраски по фото, стикеры, открытки, визитки и печатные подарки.
+            Раскраски по фото, фото на документы, визитки, открытки и печать документов.
           </motion.p>
           <motion.div className="pointer-events-auto mt-9 flex flex-col justify-center gap-3 sm:flex-row" initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.65 }}>
             <a href="#ver2-builder" className="magnetic inline-flex min-h-12 items-center justify-center rounded-full bg-pinkBrand px-7 py-4 text-center font-black uppercase text-white shadow-sticker">
@@ -622,6 +673,9 @@ function ProductChooser({
               <Image src={item.image} alt={item.short} fill className={`object-cover transition duration-500 ${item.move}`} />
             </div>
             <h3 className="mt-5 font-display text-3xl font-black uppercase">{item.short}</h3>
+            <p className="mt-3 inline-flex rounded-full bg-pinkSoft px-4 py-2 text-sm font-black uppercase text-pinkBrand">
+              {item.price}
+            </p>
             <p className="mt-2 font-bold text-graphite/62">{item.line}</p>
             <span className="mt-5 inline-flex min-h-11 items-center rounded-full bg-pinkBrand px-5 text-sm font-black uppercase text-white shadow-sticker">
               Выбрать
@@ -701,15 +755,6 @@ function HorizontalGallery({
   galleryRef: React.RefObject<HTMLDivElement | null>;
   trackRef: React.RefObject<HTMLDivElement | null>;
 }) {
-  const cards = [
-    { ...works[0], desktopSize: "lg:h-[470px] lg:w-[420px]" },
-    { ...works[1], desktopSize: "lg:h-[520px] lg:w-[330px]" },
-    { ...works[2], desktopSize: "lg:h-[390px] lg:w-[560px]" },
-    { ...works[3], desktopSize: "lg:h-[360px] lg:w-[320px]" },
-    { ...works[4], desktopSize: "lg:h-[470px] lg:w-[380px]" },
-    { ...works[5], desktopSize: "lg:h-[410px] lg:w-[520px]" }
-  ];
-
   return (
     <section id="ver2-gallery" ref={galleryRef} className="relative overflow-hidden bg-graphite py-16 text-white lg:min-h-screen">
       <div className="px-4 sm:px-6 lg:px-8">
@@ -717,13 +762,14 @@ function HorizontalGallery({
         <h2 className="mt-2 font-display text-4xl font-black uppercase sm:text-6xl">Едут по печатной ленте</h2>
       </div>
       <div ref={trackRef} className="mobile-snap mt-10 flex w-auto max-w-none items-end gap-4 overflow-x-auto px-4 pb-5 sm:px-6 lg:mt-12 lg:w-max lg:gap-5 lg:overflow-visible lg:px-8 lg:pb-0">
-        {cards.map((work, index) => (
+        {tapeCards.map((work, index) => (
           <article key={`${work.title}-${index}`} className={`peeled group h-[min(72vh,470px)] w-[min(84vw,390px)] shrink-0 snap-center overflow-hidden rounded-[1.6rem] bg-white p-2 text-graphite shadow-sticker ${work.desktopSize} lg:rounded-[2rem] lg:p-3`}>
             <div className="relative h-full overflow-hidden rounded-[1.25rem] lg:rounded-[1.5rem]">
-              <Image src={optimizedWorkImage(work.image)} alt={work.title} fill className="object-cover transition duration-700 group-hover:scale-110" />
+              <Image src={work.image} alt={work.title} fill className="object-cover transition duration-700 group-hover:scale-110" />
               <div className="absolute inset-x-4 bottom-4 rounded-2xl bg-white/90 p-4 backdrop-blur">
                 <p className="text-xs font-black uppercase text-pinkBrand">{work.category}</p>
                 <h3 className="mt-1 font-display text-2xl font-black uppercase">{work.title}</h3>
+                <p className="mt-2 text-sm font-bold text-graphite/65">{work.description}</p>
                 <a href="#ver2-order" className="mt-3 inline-flex min-h-11 items-center rounded-full bg-pinkBrand px-4 py-2 text-xs font-black uppercase text-white">
                   Хочу так же
                 </a>
@@ -749,12 +795,22 @@ function OrderBuilder({
   chooseProduct: (product: keyof typeof serviceMap) => void;
   passToForm: () => void;
 }) {
+  const availableFormats = serviceFormatOptions[builder.service];
+  const quantityLabel = builder.service === "Раскраска по фото" ? "Количество фото" : "Количество";
+  const quantityUnit = builder.service === "Раскраска по фото" ? "фото" : "шт.";
+  const helperText =
+    builder.service === "Раскраска по фото"
+      ? "В базу входят 5 фото. Сверх 5 фото добавляются к цене."
+      : builder.service === "Фото на документы"
+        ? "Для фото на документы доступны только 3x4 и 3,5x4,5."
+        : "Бумагу, резку, ламинацию и упаковку подберем под результат.";
+
   return (
-    <section id="ver2-builder" className="mx-auto grid max-w-7xl gap-7 px-4 py-[clamp(3.5rem,12vw,5rem)] sm:px-6 lg:grid-cols-[1.05fr_0.95fr] lg:px-8 lg:py-20">
+    <section id="ver2-builder" className="mx-auto grid max-w-7xl gap-5 px-4 py-12 sm:px-6 sm:py-16 lg:grid-cols-[1.05fr_0.95fr] lg:px-8 lg:py-20">
       <div>
         <p className="font-black uppercase text-pinkBrand">Конструктор заказа</p>
         <h2 className="mt-2 font-display text-4xl font-black uppercase sm:text-6xl">Соберите заказ</h2>
-        <div className="mt-6 flex gap-2 overflow-x-auto pb-1 text-xs font-black uppercase text-graphite/45 md:hidden">
+        <div className="mt-4 flex gap-2 overflow-x-auto pb-1 text-xs font-black uppercase text-graphite/45 md:hidden">
           {["1 Что", "2 Формат", "3 Кол-во", "4 Итог"].map((step) => (
             <span key={step} className="shrink-0 rounded-full bg-white px-4 py-2 shadow-paper">{step}</span>
           ))}
@@ -767,43 +823,44 @@ function OrderBuilder({
           ))}
         </BuilderGroup>
         <BuilderGroup title="Формат">
-          {formatOptions.map((item) => (
+          {availableFormats.map((item) => (
             <Chip key={item} active={builder.format === item} onClick={() => updateBuilder({ format: item })}>
               {item}
             </Chip>
           ))}
         </BuilderGroup>
-        <div className="my-8 rounded-[2rem] bg-white p-5 shadow-paper">
-          <p className="text-sm font-black uppercase text-graphite/55">Количество</p>
-          <div className="mt-4 flex items-center gap-4">
-            <button className="grid h-14 w-14 shrink-0 place-items-center rounded-full bg-graphite text-white" onClick={() => updateBuilder({ quantity: Math.max(1, builder.quantity - 1) })}>
+        <div className="my-5 rounded-[1.5rem] bg-white p-4 shadow-paper sm:my-8 sm:rounded-[2rem] sm:p-5">
+          <p className="text-sm font-black uppercase text-graphite/55">{quantityLabel}</p>
+          <div className="mt-3 flex items-center gap-4">
+            <button type="button" className="grid h-12 w-12 shrink-0 place-items-center rounded-full bg-graphite text-white sm:h-14 sm:w-14" onClick={() => updateBuilder({ quantity: Math.max(1, builder.quantity - 1) })}>
               <Minus />
             </button>
-            <motion.div key={builder.quantity} initial={{ scale: 0.8 }} animate={{ scale: 1 }} className="font-display text-6xl font-black text-pinkBrand">
+            <motion.div key={builder.quantity} initial={{ scale: 0.8 }} animate={{ scale: 1 }} className="font-display text-5xl font-black text-pinkBrand sm:text-6xl">
               {builder.quantity}
             </motion.div>
-            <button className="grid h-14 w-14 shrink-0 place-items-center rounded-full bg-pinkBrand text-white" onClick={() => updateBuilder({ quantity: builder.quantity + 1 })}>
+            <span className="text-sm font-black uppercase text-graphite/45">{quantityUnit}</span>
+            <button type="button" className="ml-auto grid h-12 w-12 shrink-0 place-items-center rounded-full bg-pinkBrand text-white sm:h-14 sm:w-14" onClick={() => updateBuilder({ quantity: builder.quantity + 1 })}>
               <Plus />
             </button>
           </div>
         </div>
-        <div className="mt-8 rounded-[2rem] bg-white/72 p-5 font-black text-graphite/60 shadow-paper backdrop-blur">
-          Бумагу, резку, ламинацию и упаковку подберем сами под результат. Вам нужно только выбрать, что хочется получить.
+        <div className="mt-5 rounded-[1.5rem] bg-white/72 p-4 font-black text-graphite/60 shadow-paper backdrop-blur sm:mt-8 sm:rounded-[2rem] sm:p-5">
+          {helperText}
         </div>
       </div>
 
       <aside className="sticky top-4 h-fit overflow-hidden rounded-[1.8rem] bg-graphite p-4 text-white shadow-paper sm:p-6 lg:top-6 lg:rounded-[2.5rem]">
-        <div className="relative h-48 overflow-hidden rounded-[1.35rem] sm:h-64 lg:rounded-[2rem]">
+        <div className="relative h-36 overflow-hidden rounded-[1.35rem] sm:h-64 lg:rounded-[2rem]">
           <Image src="/generated/optimized/order-stack.jpg" alt="Превью заказа" fill className="object-cover" />
         </div>
-        <div className="mt-6 min-h-48 rounded-[2rem] bg-white p-5 text-graphite">
+        <div className="mt-4 rounded-[1.5rem] bg-white p-4 text-graphite sm:mt-6 sm:min-h-48 sm:rounded-[2rem] sm:p-5">
           <p className="font-black uppercase text-pinkBrand">Чек печатается</p>
           <p className="mt-3 font-display text-3xl font-black uppercase">{builder.product}</p>
-          <p className="mt-2 font-bold text-graphite/60">{builder.format} / {builder.quantity} шт.</p>
-          <p className="mt-4 rounded-full bg-pinkSoft px-4 py-3 text-xs font-black uppercase text-pinkBrand">
+          <p className="mt-2 font-bold text-graphite/60">{builder.format} / {builder.quantity} {quantityUnit}</p>
+          <p className="mt-4 hidden rounded-full bg-pinkSoft px-4 py-3 text-xs font-black uppercase text-pinkBrand sm:block">
             Остальное подберем под вау-эффект
           </p>
-          <motion.p key={price} initial={{ y: 20, opacity: 0 }} animate={{ y: 0, opacity: 1 }} className="mt-6 font-display text-5xl font-black text-pinkBrand">
+          <motion.p key={price} initial={{ y: 20, opacity: 0 }} animate={{ y: 0, opacity: 1 }} className="mt-4 font-display text-5xl font-black text-pinkBrand sm:mt-6">
             {formatRub(price)}
           </motion.p>
         </div>
@@ -978,6 +1035,68 @@ function CompactFAQ() {
   );
 }
 
+function Contacts() {
+  const items = [
+    {
+      label: "ВКонтакте",
+      value: "vk.com/nasha_pechat",
+      href: "https://vk.com/nasha_pechat",
+      icon: ExternalLink,
+      external: true
+    },
+    {
+      label: "Телефон",
+      value: "8 923 527 37 38",
+      href: "tel:+79235273738",
+      icon: Phone,
+      external: false
+    },
+    {
+      label: "Почта",
+      value: "korewkov.des@gmail.com",
+      href: "mailto:korewkov.des@gmail.com",
+      icon: Mail,
+      external: false
+    }
+  ] as const;
+
+  return (
+    <section id="ver2-contacts" className="mx-auto max-w-7xl px-4 py-12 sm:px-6 sm:py-16 lg:px-8 lg:py-20">
+      <div className="rounded-[1.8rem] bg-white p-5 shadow-paper sm:p-8 lg:rounded-[2.5rem]">
+        <div className="grid gap-6 lg:grid-cols-[0.85fr_1.15fr] lg:items-end">
+          <div>
+            <p className="font-black uppercase text-pinkBrand">Контакты</p>
+            <h2 className="mt-2 font-display text-4xl font-black uppercase text-graphite sm:text-6xl">Напишите нам</h2>
+            <p className="mt-4 max-w-xl text-lg font-bold leading-relaxed text-graphite/65">
+              Подскажем по формату, цене и подготовке файлов.
+            </p>
+          </div>
+          <div className="grid gap-3 sm:grid-cols-3">
+            {items.map((item) => {
+              const Icon = item.icon;
+              return (
+                <a
+                  key={item.label}
+                  href={item.href}
+                  target={item.external ? "_blank" : undefined}
+                  rel={item.external ? "noreferrer" : undefined}
+                  className="group rounded-[1.35rem] border border-graphite/10 bg-milk p-4 shadow-paper transition hover:border-pinkBrand hover:bg-pinkSoft"
+                >
+                  <span className="grid h-11 w-11 place-items-center rounded-full bg-pinkBrand text-white shadow-sticker">
+                    <Icon size={20} />
+                  </span>
+                  <span className="mt-4 block text-xs font-black uppercase text-graphite/50">{item.label}</span>
+                  <span className="mt-1 block break-words text-sm font-black text-graphite sm:text-base">{item.value}</span>
+                </a>
+              );
+            })}
+          </div>
+        </div>
+      </div>
+    </section>
+  );
+}
+
 function QuickOrder({
   builder,
   price,
@@ -990,9 +1109,10 @@ function QuickOrder({
   const [status, setStatus] = useState<"idle" | "success" | "error">("idle");
   const [message, setMessage] = useState("");
   const [fileName, setFileName] = useState("");
+  const quantityUnit = builder.service === "Раскраска по фото" ? "фото" : "шт.";
   const summary = useMemo(
-    () => `${builder.product}, ${builder.format}, ${builder.quantity} шт., ${builder.extras.length ? builder.extras.join(", ") : "без доп. опций"}`,
-    [builder]
+    () => `${builder.product}, ${builder.format}, ${builder.quantity} ${quantityUnit}, ${builder.extras.length ? builder.extras.join(", ") : "без доп. опций"}`,
+    [builder, quantityUnit]
   );
 
   async function submit(event: React.FormEvent<HTMLFormElement>) {
@@ -1011,6 +1131,7 @@ function QuickOrder({
       urgency: builder.extras.includes("срочность") ? "срочно" : "стандартно",
       description: String(form.get("idea") || ""),
       estimatedPrice: price,
+      promoCode: String(form.get("promoCode") || ""),
       comment: [`Ver2: ${summary}`, String(form.get("comment") || ""), fileName ? `Файл: ${fileName}` : ""]
         .filter(Boolean)
         .join("\n"),
@@ -1046,9 +1167,10 @@ function QuickOrder({
       <form onSubmit={submit} className="rounded-[1.8rem] bg-white p-5 shadow-paper sm:p-7 lg:rounded-[2.5rem]">
         <div className="grid gap-4 md:grid-cols-2">
           <input name="name" required minLength={2} className="field" placeholder="Имя" />
-          <input name="contact" required minLength={6} className="field" placeholder="Телефон / Telegram / WhatsApp" />
+          <input name="contact" required minLength={6} className="field" placeholder="Телефон / мессенджер" />
         </div>
         <textarea name="idea" required minLength={8} className="field mt-4 min-h-32 resize-y" placeholder="Что хотите сделать?" />
+        <input name="promoCode" className="field mt-4" placeholder="Введите промокод, если есть" />
         <label className="mt-4 flex cursor-pointer items-center justify-between gap-4 rounded-2xl border-2 border-dashed border-pinkBrand/45 bg-pinkSoft/40 p-4 font-black text-pinkBrand">
           <span>{fileName || "Прикрепить файл / фото"}</span>
           <input type="file" className="hidden" onChange={(event) => setFileName(event.target.files?.[0]?.name ?? "")} />
@@ -1073,7 +1195,7 @@ function QuickOrder({
 
 function BuilderGroup({ title, children }: { title: string; children: React.ReactNode }) {
   return (
-    <div className="mt-8">
+    <div className="mt-5 sm:mt-8">
       <p className="mb-3 text-sm font-black uppercase text-graphite/55">{title}</p>
       <div className="flex flex-wrap gap-2">{children}</div>
     </div>
@@ -1086,7 +1208,7 @@ function Chip({ active, onClick, children }: { active: boolean; onClick: () => v
       type="button"
       onClick={onClick}
       whileTap={{ scale: 0.94 }}
-      className={`rounded-full border px-5 py-3 text-sm font-black uppercase transition ${
+      className={`min-h-11 rounded-full border px-4 py-2.5 text-sm font-black uppercase transition sm:px-5 sm:py-3 ${
         active ? "border-pinkBrand bg-pinkBrand text-white shadow-sticker" : "border-graphite/10 bg-white text-graphite shadow-paper"
       }`}
     >

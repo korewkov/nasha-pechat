@@ -24,6 +24,7 @@ export async function sendOrderToSheets(order: OrderFormValues) {
     hasDesign: order.hasDesign,
     urgency: order.urgency,
     estimatedPrice: order.estimatedPrice,
+    promoCode: order.promoCode,
     comment: [order.description, order.comment].filter(Boolean).join("\n\n"),
     source: process.env.NEXT_PUBLIC_SITE_URL ?? "landing",
     status: "Новая заявка"

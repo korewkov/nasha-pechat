@@ -26,7 +26,7 @@ export default function LandingPage() {
   const [calculator, setCalculator] = useState<CalculatorState>({
     service: "Раскраска по фото",
     format: "A5",
-    quantity: 12,
+    quantity: 5,
     paper: "плотная матовая",
     extras: ["резка"],
     total: 0

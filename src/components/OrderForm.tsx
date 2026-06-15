@@ -35,6 +35,7 @@ export default function OrderForm({ calculator }: { calculator: CalculatorState 
       urgency: "стандартно",
       description: "",
       estimatedPrice: calculator.total,
+      promoCode: "",
       comment: "",
       consent: false,
       website: ""
@@ -71,7 +72,7 @@ export default function OrderForm({ calculator }: { calculator: CalculatorState 
         ? "Заявка отправлена в mock-режиме. Подключите Google Sheets webhook для реальной таблицы."
         : "Заявка отправлена! Скоро свяжемся с вами и уточним детали."
     );
-    reset({ ...values, name: "", phone: "", messenger: "", description: "", comment: "", consent: false });
+    reset({ ...values, name: "", phone: "", messenger: "", description: "", promoCode: "", comment: "", consent: false });
   }
 
   return (
@@ -101,8 +102,8 @@ export default function OrderForm({ calculator }: { calculator: CalculatorState 
             <Field label="Телефон" error={errors.phone?.message}>
               <input {...register("phone")} className="field" placeholder="+7 912 345-67-89" />
             </Field>
-            <Field label="Telegram / WhatsApp" error={errors.messenger?.message}>
-              <input {...register("messenger")} className="field" placeholder="@nasha_pechat" />
+            <Field label="Telegram / MAX / ВК" error={errors.messenger?.message}>
+              <input {...register("messenger")} className="field" placeholder="@nasha_pechat или ссылка ВК" />
             </Field>
             <Field label="Тип услуги" error={errors.service?.message}>
               <select {...register("service")} className="field">
@@ -117,8 +118,13 @@ export default function OrderForm({ calculator }: { calculator: CalculatorState 
               <textarea
                 {...register("description")}
                 className="field min-h-32 resize-y"
-                placeholder="Например: нужны стикеры для упаковки, хочу нежно-розовые, макета пока нет..."
+                placeholder="Например: нужна раскраска по фото или небольшой тираж открыток, макета пока нет..."
               />
+            </Field>
+          </div>
+          <div className="mt-4">
+            <Field label="Промокод" error={errors.promoCode?.message}>
+              <input {...register("promoCode")} className="field" placeholder="Введите промокод, если есть" />
             </Field>
           </div>
           <div className="mt-4 rounded-3xl bg-milk p-4">
