@@ -11,7 +11,6 @@ import {
   ChevronDown,
   Copy,
   ExternalLink,
-  FileImage,
   Gift,
   Heart,
   Mail,
@@ -34,54 +33,6 @@ import {
   type ServiceType
 } from "@/config/pricing.config";
 import { formatRub } from "@/lib/utils";
-
-const products = [
-  {
-    short: "Раскраска",
-    service: "Раскраска по фото",
-    price: "от 1000 ₽",
-    line: "Фото превращаем в книжку.",
-    image: "/works/optimized/coloring-1.jpg",
-    assetPath: "/images/services/coloring-book.jpg",
-    move: "group-hover:[transform:rotate(-3deg)_translateY(-10px)]"
-  },
-  {
-    short: "Фото",
-    service: "Фото на документы",
-    price: "от 300 ₽",
-    line: "Ровно, чисто, по формату.",
-    image: "/works/optimized/photo-1.jpg",
-    assetPath: "/images/services/document-photo.jpg",
-    move: "group-hover:brightness-110"
-  },
-  {
-    short: "Визитки",
-    service: "Визитки",
-    price: "от 500 ₽",
-    line: "Карточки, которые держат стиль.",
-    image: "/works/optimized/business-1.jpg",
-    assetPath: "/images/services/business-cards.jpg",
-    move: "group-hover:[transform:translateX(10px)_rotate(2deg)]"
-  },
-  {
-    short: "Открытки",
-    service: "Открытки",
-    price: "от 200 ₽",
-    line: "Спасибо, праздник, вау.",
-    image: "/works/optimized/card-1.jpg",
-    assetPath: "/images/services/postcards.jpg",
-    move: "group-hover:[transform:rotate(-2deg)_scale(1.04)]"
-  },
-  {
-    short: "Документы",
-    service: "Документы",
-    price: "от 100 ₽",
-    line: "Печать, сборка, ламинация.",
-    image: "/works/optimized/printing-1.jpg",
-    assetPath: "/images/services/documents-print.jpg",
-    move: "group-hover:[transform:translateY(-12px)]"
-  }
-] as const;
 
 const serviceMap: Record<string, ServiceType> = {
   Раскраска: "Раскраска по фото",
@@ -154,43 +105,43 @@ const cloudLabels = ["Раскраска", "Фото", "Визитки", "Отк
 
 const tapeCards = [
   {
-    title: "Персональная раскраска",
-    description: "Раскраска по фото ребёнка, семьи или любимого момента",
+    title: "Раскраска по фото",
+    description: "Персональная раскраска по фотографиям ребёнка, семьи или любимого момента.",
+    price: "от 1000 ₽",
     category: "Раскраски",
-    image: "/works/optimized/coloring-1.jpg",
-    assetPath: "/images/tape/tape-coloring.jpg",
+    image: "/images/tape/tape-coloring.jpeg",
     desktopSize: "lg:h-[470px] lg:w-[420px]"
   },
   {
     title: "Фото на документы",
-    description: "Фото 3x4 и 3,5x4,5 для документов",
+    description: "Фото 3x4 и 3,5x4,5 для документов.",
+    price: "от 300 ₽",
     category: "Фото",
-    image: "/works/optimized/photo-1.jpg",
-    assetPath: "/images/tape/tape-doc-photo.jpg",
+    image: "/images/tape/tape-doc-photo.jpeg",
     desktopSize: "lg:h-[520px] lg:w-[330px]"
   },
   {
     title: "Визитки",
-    description: "Аккуратные визитки для себя, мастера или малого бизнеса",
+    description: "Аккуратные визитки для себя, мастера или малого бизнеса.",
+    price: "от 500 ₽",
     category: "Визитки",
-    image: "/works/optimized/business-1.jpg",
-    assetPath: "/images/tape/tape-business-cards.jpg",
+    image: "/images/tape/tape-business-cards.jpeg",
     desktopSize: "lg:h-[390px] lg:w-[560px]"
   },
   {
     title: "Открытки",
-    description: "Открытки для подарков, праздников и тёплых слов",
+    description: "Открытки для подарков, праздников и тёплых слов.",
+    price: "от 200 ₽",
     category: "Открытки",
-    image: "/works/optimized/card-1.jpg",
-    assetPath: "/images/tape/tape-postcards.jpg",
+    image: "/images/tape/tape-postcards.jpeg",
     desktopSize: "lg:h-[470px] lg:w-[380px]"
   },
   {
-    title: "Печать документов",
-    description: "Распечатка документов, файлов, анкет и учебных материалов",
+    title: "Документы",
+    description: "Печать документов, анкет, файлов и учебных материалов.",
+    price: "от 100 ₽",
     category: "Документы",
-    image: "/works/optimized/printing-1.jpg",
-    assetPath: "/images/tape/tape-documents.jpg",
+    image: "/images/tape/tape-documents.jpeg",
     desktopSize: "lg:h-[410px] lg:w-[520px]"
   }
 ] as const;
@@ -302,10 +253,9 @@ export default function Ver2Landing() {
         style={{ transform: `translate3d(${cursor.x - 144}px, ${cursor.y - 144}px, 0)` }}
       />
       <HeroScene />
-      <ProductChooser chooseProduct={chooseProduct} active={builder.product} />
+      <HorizontalGallery galleryRef={galleryRef} trackRef={galleryTrackRef} />
       <ColoringSlider />
       <ProcessReels />
-      <HorizontalGallery galleryRef={galleryRef} trackRef={galleryTrackRef} />
       <OrderBuilder
         builder={builder}
         price={price.total}
@@ -316,8 +266,8 @@ export default function Ver2Landing() {
       <GiftMiniGame />
       <EmotionReasons />
       <CompactFAQ />
-      <Contacts />
       <QuickOrder builder={builder} price={price.total} copiedToForm={copiedToForm} />
+      <Contacts />
       <MobileBottomCTA />
     </main>
   );
@@ -423,9 +373,9 @@ function HeroScene() {
           <Image src="/brand/logos/logo-wide-alt.svg" alt="Наша печать" fill className="object-contain object-left" priority />
         </a>
         <div className="hidden gap-6 text-sm font-black uppercase text-graphite/60 md:flex">
-          <a href="#ver2-products">Что печатаем</a>
-          <a href="#ver2-gallery">Работы</a>
-          <a href="#ver2-builder">Собрать</a>
+          <a href="#ver2-products">Услуги</a>
+          <a href="#ver2-builder">Калькулятор</a>
+          <a href="#ver2-order">Заявка</a>
         </div>
         <a href="#ver2-order" className="inline-flex min-h-11 items-center rounded-full bg-pinkBrand px-4 text-xs font-black uppercase text-white shadow-sticker md:hidden">
           Заявка
@@ -459,8 +409,8 @@ function HeroScene() {
             <a href="#ver2-builder" className="magnetic inline-flex min-h-12 items-center justify-center rounded-full bg-pinkBrand px-7 py-4 text-center font-black uppercase text-white shadow-sticker">
               Собрать заказ
             </a>
-            <a href="#ver2-gallery" className="magnetic inline-flex min-h-12 items-center justify-center rounded-full border-2 border-graphite bg-white px-7 py-4 text-center font-black uppercase text-graphite">
-              Смотреть работы
+            <a href="#ver2-products" className="magnetic inline-flex min-h-12 items-center justify-center rounded-full border-2 border-graphite bg-white px-7 py-4 text-center font-black uppercase text-graphite">
+              Смотреть услуги
             </a>
           </motion.div>
         </div>
@@ -646,47 +596,6 @@ function CloudPlayground() {
   );
 }
 
-function ProductChooser({
-  active,
-  chooseProduct
-}: {
-  active: keyof typeof serviceMap;
-  chooseProduct: (product: keyof typeof serviceMap) => void;
-}) {
-  return (
-    <section id="ver2-products" className="mx-auto max-w-7xl px-4 py-[clamp(3.5rem,12vw,5rem)] sm:px-6 lg:px-8 lg:py-20">
-      <div className="mb-10 flex flex-col gap-3 md:flex-row md:items-end md:justify-between">
-        <h2 className="font-display text-4xl font-black uppercase sm:text-6xl">Что печатаем?</h2>
-        <p className="max-w-md text-lg font-black text-graphite/60">Выберите вещь. Остальное подскажем.</p>
-      </div>
-      <div className="mobile-snap -mx-4 flex gap-4 overflow-x-auto px-4 pb-4 md:mx-0 md:grid md:grid-cols-3 md:overflow-visible md:px-0 md:pb-0">
-        {products.map((item) => (
-          <button
-            key={item.short}
-            type="button"
-            onClick={() => chooseProduct(item.short as keyof typeof serviceMap)}
-            className={`group peeled min-h-[340px] w-[min(82vw,22rem)] shrink-0 snap-center overflow-hidden rounded-[1.6rem] border bg-white p-4 text-left shadow-paper transition md:w-auto lg:rounded-[2rem] ${
-              active === item.short ? "border-pinkBrand ring-4 ring-pinkSoft" : "border-graphite/10"
-            }`}
-          >
-            <div className="relative h-44 overflow-hidden rounded-[1.25rem] bg-pinkSoft sm:h-48 lg:rounded-[1.5rem]">
-              <Image src={item.image} alt={item.short} fill className={`object-cover transition duration-500 ${item.move}`} />
-            </div>
-            <h3 className="mt-5 font-display text-3xl font-black uppercase">{item.short}</h3>
-            <p className="mt-3 inline-flex rounded-full bg-pinkSoft px-4 py-2 text-sm font-black uppercase text-pinkBrand">
-              {item.price}
-            </p>
-            <p className="mt-2 font-bold text-graphite/62">{item.line}</p>
-            <span className="mt-5 inline-flex min-h-11 items-center rounded-full bg-pinkBrand px-5 text-sm font-black uppercase text-white shadow-sticker">
-              Выбрать
-            </span>
-          </button>
-        ))}
-      </div>
-    </section>
-  );
-}
-
 function ColoringSlider() {
   const [position, setPosition] = useState(58);
   const mode = position < 50 ? "Фото" : "Раскраска";
@@ -756,23 +665,31 @@ function HorizontalGallery({
   trackRef: React.RefObject<HTMLDivElement | null>;
 }) {
   return (
-    <section id="ver2-gallery" ref={galleryRef} className="relative overflow-hidden bg-graphite py-16 text-white lg:min-h-screen">
+    <section id="ver2-products" ref={galleryRef} className="relative overflow-hidden bg-graphite py-16 text-white lg:min-h-screen">
       <div className="px-4 sm:px-6 lg:px-8">
-        <p className="font-black uppercase text-pinkSoft">Витрина работ</p>
+        <p className="font-black uppercase text-pinkSoft">Услуги и цены</p>
         <h2 className="mt-2 font-display text-4xl font-black uppercase sm:text-6xl">Едут по печатной ленте</h2>
+        <p className="mt-4 max-w-xl text-lg font-black text-white/62">
+          Листайте поток печатных вещей: видно, что заказать, как это выглядит и от какой цены стартует.
+        </p>
       </div>
       <div ref={trackRef} className="mobile-snap mt-10 flex w-auto max-w-none items-end gap-4 overflow-x-auto px-4 pb-5 sm:px-6 lg:mt-12 lg:w-max lg:gap-5 lg:overflow-visible lg:px-8 lg:pb-0">
         {tapeCards.map((work, index) => (
-          <article key={`${work.title}-${index}`} className={`peeled group h-[min(72vh,470px)] w-[min(84vw,390px)] shrink-0 snap-center overflow-hidden rounded-[1.6rem] bg-white p-2 text-graphite shadow-sticker ${work.desktopSize} lg:rounded-[2rem] lg:p-3`}>
+          <article key={`${work.title}-${index}`} className={`peeled group h-[min(72vh,500px)] w-[min(84vw,390px)] shrink-0 snap-center overflow-hidden rounded-[1.6rem] bg-white p-2 text-graphite shadow-sticker ${work.desktopSize} lg:rounded-[2rem] lg:p-3`}>
             <div className="relative h-full overflow-hidden rounded-[1.25rem] lg:rounded-[1.5rem]">
               <Image src={work.image} alt={work.title} fill className="object-cover transition duration-700 group-hover:scale-110" />
-              <div className="absolute inset-x-4 bottom-4 rounded-2xl bg-white/90 p-4 backdrop-blur">
+              <div className="absolute inset-x-3 bottom-3 rounded-2xl bg-white/92 p-4 backdrop-blur sm:inset-x-4 sm:bottom-4">
                 <p className="text-xs font-black uppercase text-pinkBrand">{work.category}</p>
-                <h3 className="mt-1 font-display text-2xl font-black uppercase">{work.title}</h3>
+                <h3 className="mt-1 font-display text-2xl font-black uppercase leading-none sm:text-3xl">{work.title}</h3>
                 <p className="mt-2 text-sm font-bold text-graphite/65">{work.description}</p>
-                <a href="#ver2-order" className="mt-3 inline-flex min-h-11 items-center rounded-full bg-pinkBrand px-4 py-2 text-xs font-black uppercase text-white">
-                  Хочу так же
-                </a>
+                <div className="mt-4 flex flex-wrap items-center gap-2">
+                  <span className="rounded-full bg-pinkSoft px-4 py-2 text-sm font-black uppercase text-pinkBrand">
+                    {work.price}
+                  </span>
+                  <a href="#ver2-builder" className="inline-flex min-h-11 items-center rounded-full bg-pinkBrand px-4 py-2 text-xs font-black uppercase text-white shadow-sticker">
+                    Рассчитать
+                  </a>
+                </div>
               </div>
             </div>
           </article>
@@ -1061,14 +978,14 @@ function Contacts() {
   ] as const;
 
   return (
-    <section id="ver2-contacts" className="mx-auto max-w-7xl px-4 py-12 sm:px-6 sm:py-16 lg:px-8 lg:py-20">
-      <div className="rounded-[1.8rem] bg-white p-5 shadow-paper sm:p-8 lg:rounded-[2.5rem]">
+    <footer id="ver2-contacts" className="bg-graphite px-4 pb-28 pt-12 text-white sm:px-6 sm:pt-16 lg:px-8 lg:pb-12 lg:pt-20">
+      <div className="mx-auto max-w-7xl rounded-[1.8rem] border border-white/10 bg-white/8 p-5 shadow-paper backdrop-blur sm:p-8 lg:rounded-[2.5rem]">
         <div className="grid gap-6 lg:grid-cols-[0.85fr_1.15fr] lg:items-end">
           <div>
-            <p className="font-black uppercase text-pinkBrand">Контакты</p>
-            <h2 className="mt-2 font-display text-4xl font-black uppercase text-graphite sm:text-6xl">Напишите нам</h2>
-            <p className="mt-4 max-w-xl text-lg font-bold leading-relaxed text-graphite/65">
-              Подскажем по формату, цене и подготовке файлов.
+            <p className="font-black uppercase text-pinkSoft">Контакты</p>
+            <h2 className="mt-2 font-display text-4xl font-black uppercase sm:text-6xl">Напишите нам</h2>
+            <p className="mt-4 max-w-xl text-lg font-bold leading-relaxed text-white/70">
+              Напишите нам — подскажем по формату, цене и подготовке файлов.
             </p>
           </div>
           <div className="grid gap-3 sm:grid-cols-3">
@@ -1080,7 +997,7 @@ function Contacts() {
                   href={item.href}
                   target={item.external ? "_blank" : undefined}
                   rel={item.external ? "noreferrer" : undefined}
-                  className="group rounded-[1.35rem] border border-graphite/10 bg-milk p-4 shadow-paper transition hover:border-pinkBrand hover:bg-pinkSoft"
+                  className="group rounded-[1.35rem] border border-white/10 bg-white p-4 text-graphite shadow-paper transition hover:border-pinkBrand hover:bg-pinkSoft"
                 >
                   <span className="grid h-11 w-11 place-items-center rounded-full bg-pinkBrand text-white shadow-sticker">
                     <Icon size={20} />
@@ -1093,7 +1010,7 @@ function Contacts() {
           </div>
         </div>
       </div>
-    </section>
+    </footer>
   );
 }
 
@@ -1108,7 +1025,6 @@ function QuickOrder({
 }) {
   const [status, setStatus] = useState<"idle" | "success" | "error">("idle");
   const [message, setMessage] = useState("");
-  const [fileName, setFileName] = useState("");
   const quantityUnit = builder.service === "Раскраска по фото" ? "фото" : "шт.";
   const summary = useMemo(
     () => `${builder.product}, ${builder.format}, ${builder.quantity} ${quantityUnit}, ${builder.extras.length ? builder.extras.join(", ") : "без доп. опций"}`,
@@ -1132,7 +1048,7 @@ function QuickOrder({
       description: String(form.get("idea") || ""),
       estimatedPrice: price,
       promoCode: String(form.get("promoCode") || ""),
-      comment: [`Ver2: ${summary}`, String(form.get("comment") || ""), fileName ? `Файл: ${fileName}` : ""]
+      comment: [`Ver2: ${summary}`, String(form.get("comment") || "")]
         .filter(Boolean)
         .join("\n"),
       consent: true,
@@ -1153,11 +1069,16 @@ function QuickOrder({
   }
 
   return (
-    <section id="ver2-order" className="mx-auto grid max-w-7xl gap-8 px-4 pb-28 pt-[clamp(3.5rem,12vw,5rem)] sm:px-6 lg:grid-cols-[0.8fr_1.2fr] lg:px-8 lg:py-20">
+    <section id="ver2-order" className="mx-auto grid max-w-7xl gap-8 px-4 py-[clamp(3.5rem,12vw,5rem)] sm:px-6 lg:grid-cols-[0.8fr_1.2fr] lg:px-8 lg:py-20">
       <div className="rounded-[1.8rem] bg-graphite p-5 text-white shadow-paper sm:p-7 lg:rounded-[2.5rem]">
         <p className="font-black uppercase text-pinkSoft">Форма заявки</p>
-        <h2 className="mt-3 font-display text-4xl font-black uppercase sm:text-5xl">Что печатаем?</h2>
-        <p className="mt-6 text-lg font-bold text-white/70">Не знаете формат и бумагу? Ничего страшного. Напишите идею — подскажем лучший вариант.</p>
+        <h2 className="mt-3 font-display text-4xl font-black uppercase sm:text-5xl">Оставить заявку</h2>
+        <p className="mt-6 text-lg font-bold text-white/70">
+          Не знаете формат и бумагу? Ничего страшного. Напишите идею — подскажем лучший вариант.
+        </p>
+        <p className="mt-4 text-sm font-bold leading-relaxed text-white/55">
+          Фото можно передать через Telegram, MAX, ВКонтакте или отправить на электронную почту. После заявки мы подскажем самый удобный способ.
+        </p>
         <motion.div animate={copiedToForm ? { scale: [1, 1.04, 1], rotate: [-1, 2, 0] } : {}} className="peeled mt-8 rounded-3xl bg-pinkBrand p-5 shadow-sticker">
           <p className="text-sm font-black uppercase">Из конструктора</p>
           <p className="mt-2 font-display text-2xl font-black uppercase">{summary}</p>
@@ -1171,11 +1092,6 @@ function QuickOrder({
         </div>
         <textarea name="idea" required minLength={8} className="field mt-4 min-h-32 resize-y" placeholder="Что хотите сделать?" />
         <input name="promoCode" className="field mt-4" placeholder="Введите промокод, если есть" />
-        <label className="mt-4 flex cursor-pointer items-center justify-between gap-4 rounded-2xl border-2 border-dashed border-pinkBrand/45 bg-pinkSoft/40 p-4 font-black text-pinkBrand">
-          <span>{fileName || "Прикрепить файл / фото"}</span>
-          <input type="file" className="hidden" onChange={(event) => setFileName(event.target.files?.[0]?.name ?? "")} />
-          <FileImage />
-        </label>
         <textarea name="comment" className="field mt-4 min-h-24 resize-y" placeholder="Комментарий, срок, пожелания" />
         <button className="magnetic mt-5 inline-flex min-h-12 w-full items-center justify-center gap-2 rounded-full bg-pinkBrand px-7 py-4 font-black uppercase text-white shadow-sticker md:w-auto">
           <Send size={20} /> Отправить заявку
@@ -1225,13 +1141,13 @@ function MobileBottomCTA() {
         <ShoppingBag size={18} />
         Заказать
       </a>
-      <a href="#ver2-gallery" className="flex min-h-12 flex-col items-center justify-center rounded-2xl bg-pinkSoft px-2 text-[11px] font-black uppercase text-pinkBrand">
+      <a href="#ver2-products" className="flex min-h-12 flex-col items-center justify-center rounded-2xl bg-pinkSoft px-2 text-[11px] font-black uppercase text-pinkBrand">
         <Rows3 size={18} />
-        Работы
-      </a>
-      <a href="#ver2-products" className="flex min-h-12 flex-col items-center justify-center rounded-2xl bg-graphite px-2 text-[11px] font-black uppercase text-white">
-        <Wrench size={18} />
         Услуги
+      </a>
+      <a href="#ver2-order" className="flex min-h-12 flex-col items-center justify-center rounded-2xl bg-graphite px-2 text-[11px] font-black uppercase text-white">
+        <Wrench size={18} />
+        Заявка
       </a>
     </nav>
   );
