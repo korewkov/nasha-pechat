@@ -9,6 +9,7 @@ import { ScrollTrigger } from "gsap/ScrollTrigger";
 import {
   Check,
   ChevronDown,
+  Copy,
   FileImage,
   Gift,
   Heart,
@@ -506,6 +507,7 @@ function CloudPlayground() {
           onPointerEnter={() => updateBlob(blob.id, { hovered: true })}
           onPointerLeave={() => updateBlob(blob.id, { hovered: false })}
           onPointerDown={(event) => {
+            event.preventDefault();
             event.currentTarget.setPointerCapture(event.pointerId);
             updateBlob(blob.id, { dragging: true, lastX: event.clientX, lastY: event.clientY, hovered: true });
           }}
@@ -532,14 +534,32 @@ function CloudPlayground() {
               vy: Math.max(-1.4, Math.min(1.4, current.vy || (blob.id % 3 ? -0.7 : 0.7)))
             });
           }}
-          className="cloud-blob absolute grid cursor-grab place-items-center px-8 text-center text-sm font-black uppercase text-graphite transition-transform active:cursor-grabbing"
+          onPointerCancel={() => {
+            updateBlob(blob.id, {
+              dragging: false,
+              vx: blob.id % 2 ? 1 : -1,
+              vy: blob.id % 3 ? -0.72 : 0.72
+            });
+          }}
+          onLostPointerCapture={() => {
+            const current = blobsRef.current.find((item) => item.id === blob.id) ?? blob;
+            if (!current.dragging) return;
+            updateBlob(blob.id, {
+              dragging: false,
+              vx: Math.abs(current.vx) < 0.35 ? (blob.id % 2 ? 1 : -1) : current.vx,
+              vy: Math.abs(current.vy) < 0.28 ? (blob.id % 3 ? -0.72 : 0.72) : current.vy
+            });
+          }}
+          className="cloud-blob absolute grid cursor-grab select-none place-items-center px-8 text-center text-sm font-black uppercase text-graphite transition-transform active:cursor-grabbing"
           style={{
             width: blob.w,
             height: blob.h,
-            transform: `translate3d(${blob.x}px, ${blob.y}px, 0) scale(${blob.hovered ? 1.08 : 1})`
+            transform: `translate3d(${blob.x}px, ${blob.y}px, 0) scale(${blob.hovered ? 1.08 : 1})`,
+            userSelect: "none",
+            WebkitUserSelect: "none"
           }}
         >
-          <span className="relative z-10 pointer-events-none">{blob.label}</span>
+          <span className="pointer-events-none relative z-10 select-none">{blob.label}</span>
         </div>
       ))}
     </div>
@@ -760,39 +780,41 @@ function OrderBuilder({
 
 function GiftMiniGame() {
   const [clicks, setClicks] = useState(0);
+  const [copied, setCopied] = useState(false);
   const targetClicks = 18;
   const progress = Math.min(100, Math.round((clicks / targetClicks) * 100));
   const unlocked = progress >= 100;
+  const side = Math.min(100, progress * 4);
+  const top = Math.min(100, side);
+  const right = Math.min(100, Math.max(0, side - 100));
+  const bottom = Math.min(100, Math.max(0, side - 200));
+  const left = Math.min(100, Math.max(0, side - 300));
+
+  async function copyPromo() {
+    await navigator.clipboard?.writeText("НАШИ10");
+    setCopied(true);
+    window.setTimeout(() => setCopied(false), 1200);
+  }
 
   return (
     <section className="mx-auto max-w-7xl px-4 py-20 sm:px-6 lg:px-8">
       <div className="mb-8 max-w-3xl">
-        <p className="font-black uppercase text-pinkBrand">Мини-игра</p>
         <h2 className="mt-2 font-display text-4xl font-black uppercase sm:text-6xl">Нажмите на вау</h2>
         <p className="mt-5 text-lg font-bold text-graphite/62">
           Добейте шкалу радости до конца — внутри спрятан подарок для первого заказа.
         </p>
       </div>
-      <div className="relative min-h-[540px] overflow-hidden rounded-[2.75rem] bg-pinkBrand p-5 shadow-sticker sm:p-8">
-        <svg className="pointer-events-none absolute inset-0 h-full w-full" viewBox="0 0 100 100" preserveAspectRatio="none">
-          <rect x="2" y="2" width="96" height="96" rx="7" fill="none" stroke="rgba(255,255,255,.34)" strokeWidth="1.8" />
-          <motion.rect
-            x="2"
-            y="2"
-            width="96"
-            height="96"
-            rx="7"
-            fill="none"
-            stroke="white"
-            strokeWidth="1.8"
-            pathLength="100"
-            strokeDasharray="100"
-            animate={{ strokeDashoffset: 100 - progress }}
-            transition={{ duration: 0.22 }}
-          />
-        </svg>
+      <div className="relative overflow-hidden rounded-[2.75rem] bg-pinkBrand p-4 shadow-sticker sm:p-6">
+        {!unlocked && (
+          <div className="pointer-events-none absolute inset-4 z-40 rounded-[2.1rem] sm:inset-6">
+            <motion.div className="absolute left-0 top-0 h-1.5 rounded-full bg-white" animate={{ width: `${top}%` }} />
+            <motion.div className="absolute right-0 top-0 w-1.5 rounded-full bg-white" animate={{ height: `${right}%` }} />
+            <motion.div className="absolute bottom-0 right-0 h-1.5 rounded-full bg-white" animate={{ width: `${bottom}%` }} />
+            <motion.div className="absolute bottom-0 left-0 w-1.5 rounded-full bg-white" animate={{ height: `${left}%` }} />
+          </div>
+        )}
 
-        <div className="relative grid min-h-[480px] place-items-center overflow-hidden rounded-[2.1rem] bg-white">
+        <div className="relative grid min-h-[500px] place-items-center overflow-hidden rounded-[2.1rem] bg-white">
           <motion.div
             initial={false}
             animate={unlocked ? { scale: 1, opacity: 1 } : { scale: 0.9, opacity: 0.22 }}
@@ -805,12 +827,18 @@ function GiftMiniGame() {
             </div>
             <p className="mt-7 font-display text-4xl font-black uppercase text-graphite">Скидка 10%</p>
             <p className="mt-2 text-lg font-black text-graphite/62">на первый заказ</p>
-            <p className="mt-5 rounded-full bg-pinkSoft px-6 py-3 font-display text-2xl font-black uppercase text-pinkBrand">
-              Промокод: НАШИ10
-            </p>
-            <a href="#ver2-order" className="magnetic mt-6 rounded-full bg-graphite px-7 py-4 font-black uppercase text-white">
-              Забрать подарок
-            </a>
+            <div className="mt-5 flex items-center gap-2 rounded-full bg-pinkSoft px-4 py-3">
+              <p className="font-display text-xl font-black uppercase text-pinkBrand sm:text-2xl">Промокод: НАШИ10</p>
+              <button
+                type="button"
+                onClick={copyPromo}
+                className="grid h-10 w-10 shrink-0 place-items-center rounded-full bg-white text-pinkBrand shadow-paper transition hover:bg-graphite hover:text-white"
+                aria-label="Скопировать промокод"
+              >
+                <Copy size={18} />
+              </button>
+            </div>
+            {copied && <p className="mt-3 text-sm font-black uppercase text-pinkBrand">Скопировано</p>}
           </motion.div>
 
           <AnimatePresence>
@@ -839,9 +867,6 @@ function GiftMiniGame() {
                       Вау
                     </motion.button>
                     <p className="mt-7 font-display text-4xl font-black text-white">{progress}%</p>
-                    <p className="mt-2 text-sm font-black uppercase tracking-normal text-white/78">
-                      Нажмите еще {Math.max(0, targetClicks - clicks)} раз
-                    </p>
                   </div>
                 </div>
               </>
