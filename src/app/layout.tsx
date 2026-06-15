@@ -17,9 +17,9 @@ export const metadata: Metadata = {
     type: "website"
   },
   icons: {
-    icon: "/brand/logos/logo-compact.svg",
-    shortcut: "/brand/logos/logo-compact.svg",
-    apple: "/brand/logos/logo-compact-crop.png"
+    icon: "/brand/logos/logo-mark-1.svg",
+    shortcut: "/brand/logos/logo-mark-1.svg",
+    apple: "/brand/logos/logo-mark-1.png"
   }
 };
 

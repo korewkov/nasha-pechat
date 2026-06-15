@@ -10,11 +10,11 @@ import {
   Check,
   ChevronDown,
   FileImage,
+  Gift,
+  Heart,
   Minus,
-  PackageCheck,
   Play,
   Plus,
-  Printer,
   Send,
   Sparkles
 } from "lucide-react";
@@ -83,7 +83,6 @@ const serviceMap: Record<string, ServiceType> = {
 };
 
 const formatOptions: PrintFormat[] = ["A6", "A5", "A4", "10x15", "свой размер"];
-const extraOptions: ExtraOption[] = ["ламинация", "резка", "упаковка", "разработка макета", "срочность"];
 const faqItems = [
   ["Можно одну штуку?", "Да. Печатаем маленькие заказы без неловкости."],
   ["Можно без макета?", "Да. Напишите идею, подскажем формат и подготовку."],
@@ -140,7 +139,7 @@ const initialBuilder: BuilderState = {
   format: "A5",
   quantity: 12,
   paper: "плотная матовая",
-  extras: ["резка"]
+  extras: []
 };
 
 const cloudLabels = ["Раскраска", "Стикеры", "Визитки", "Открытки", "Фото", "Ламинация"] as const;
@@ -164,7 +163,6 @@ function optimizedWorkImage(path: string) {
 export default function Ver2Landing() {
   const galleryRef = useRef<HTMLDivElement>(null);
   const galleryTrackRef = useRef<HTMLDivElement>(null);
-  const processRef = useRef<HTMLDivElement>(null);
   const [builder, setBuilder] = useState<BuilderState>(initialBuilder);
   const [copiedToForm, setCopiedToForm] = useState(false);
   const [cursor, setCursor] = useState({ x: -400, y: -400 });
@@ -209,16 +207,6 @@ export default function Ver2Landing() {
         scrollTrigger: { trigger: ".ver2-hero", start: "top top", end: "bottom top", scrub: true }
       });
 
-      gsap.to(".process-tape", {
-        width: "100%",
-        ease: "none",
-        scrollTrigger: {
-          trigger: processRef.current,
-          start: "top center",
-          end: "bottom center",
-          scrub: true
-        }
-      });
     });
 
     return () => {
@@ -236,15 +224,6 @@ export default function Ver2Landing() {
     setBuilder((current) => ({ ...current, product, service: serviceMap[product] }));
   }
 
-  function toggleExtra(extra: ExtraOption) {
-    setBuilder((current) => ({
-      ...current,
-      extras: current.extras.includes(extra)
-        ? current.extras.filter((item) => item !== extra)
-        : [...current.extras, extra]
-    }));
-  }
-
   function passToForm() {
     setCopiedToForm(true);
     document.querySelector("#ver2-order")?.scrollIntoView({ behavior: "smooth", block: "start" });
@@ -256,10 +235,9 @@ export default function Ver2Landing() {
       className="relative max-w-[100vw] overflow-x-clip bg-gradient-to-br from-white via-milk to-pinkSoft/70 text-graphite"
       onPointerMove={(event) => setCursor({ x: event.clientX, y: event.clientY })}
     >
-      <motion.div
-        className="cursor-glow pointer-events-none fixed left-0 top-0 z-[80] hidden h-72 w-72 -translate-x-1/2 -translate-y-1/2 rounded-full blur-xl lg:block"
-        animate={{ x: cursor.x, y: cursor.y }}
-        transition={{ type: "spring", stiffness: 90, damping: 24, mass: 0.35 }}
+      <div
+        className="cursor-glow pointer-events-none fixed left-0 top-0 z-[80] hidden h-72 w-72 rounded-full blur-xl lg:block"
+        style={{ transform: `translate3d(${cursor.x - 144}px, ${cursor.y - 144}px, 0)` }}
       />
       <HeroScene />
       <ProductChooser chooseProduct={chooseProduct} active={builder.product} />
@@ -271,11 +249,10 @@ export default function Ver2Landing() {
         price={price.total}
         updateBuilder={updateBuilder}
         chooseProduct={chooseProduct}
-        toggleExtra={toggleExtra}
         passToForm={passToForm}
       />
-      <ProcessTape processRef={processRef} />
-      <StickerBenefits />
+      <GiftMiniGame />
+      <EmotionReasons />
       <CompactFAQ />
       <QuickOrder builder={builder} price={price.total} copiedToForm={copiedToForm} />
     </main>
@@ -293,7 +270,7 @@ function ProcessReels() {
           </h2>
         </div>
         <p className="max-w-sm text-lg font-black text-graphite/60">
-          Вертикальные ролики без звука: печать, резка, сборка, упаковка.
+          Маленькая магия: из файла на экране рождается вещь, которую хочется держать в руках.
         </p>
       </div>
       <div className="flex gap-5 overflow-x-auto pb-5">
@@ -339,7 +316,7 @@ function ProcessReels() {
         ))}
       </div>
       <p className="mt-2 text-sm font-bold text-graphite/45">
-        Ролики проигрываются без звука и показывают процесс создания заказа.
+        Наведите курсор на карточку — и процесс оживет.
       </p>
     </section>
   );
@@ -359,9 +336,9 @@ function HeroScene() {
       <div className="absolute inset-0 -z-10 bg-gradient-to-br from-white/95 via-white/68 to-pinkSoft/76" />
       <div className="absolute inset-x-0 bottom-0 -z-10 h-48 bg-gradient-to-t from-milk to-transparent" />
       <CloudPlayground />
-      <nav className="relative z-30 mx-auto flex max-w-7xl items-center justify-between rounded-full bg-white/82 px-4 py-3 shadow-paper backdrop-blur">
-        <a href="/" className="relative h-10 w-44 overflow-hidden" aria-label="Наша печать">
-          <Image src="/brand/logos/logo-main.png" alt="Наша печать" fill className="object-contain object-left" priority />
+      <nav className="relative z-50 mx-auto flex max-w-7xl items-center justify-between rounded-full bg-white/82 px-5 py-4 shadow-paper backdrop-blur">
+        <a href="/" className="relative h-14 w-64 overflow-hidden" aria-label="Наша печать">
+          <Image src="/brand/logos/logo-wide-alt.svg" alt="Наша печать" fill className="object-contain object-left" priority />
         </a>
         <div className="hidden gap-6 text-sm font-black uppercase text-graphite/60 md:flex">
           <a href="#ver2-products">Что печатаем</a>
@@ -370,7 +347,7 @@ function HeroScene() {
         </div>
       </nav>
 
-      <div className="relative z-20 mx-auto flex min-h-[calc(100vh-6.5rem)] max-w-7xl items-center justify-center py-20 text-center">
+      <div className="relative z-20 mx-auto flex min-h-[calc(100vh-7.5rem)] max-w-7xl items-center justify-center py-20 text-center">
         <div className="pointer-events-none select-none">
           <div className="space-y-2 overflow-hidden font-display text-[clamp(3rem,7.6vw,7.4rem)] font-black uppercase leading-[0.88] tracking-normal">
             {["Печатаем смело.", "Делаем красиво."].map((line, index) => (
@@ -461,18 +438,7 @@ function CloudPlayground() {
           item.y = Math.max(84, Math.min(rect.height - item.h - 28, item.y));
         }
 
-        if (mouseRef.current.active && !item.dragging) {
-          const cx = item.x + item.w / 2;
-          const cy = item.y + item.h / 2;
-          const dx = cx - mouseRef.current.x;
-          const dy = cy - mouseRef.current.y;
-          const distance = Math.max(22, Math.hypot(dx, dy));
-          if (distance < 190) {
-            const force = (190 - distance) / 190;
-            item.vx += (dx / distance) * force * 0.9;
-            item.vy += (dy / distance) * force * 0.9;
-          }
-        }
+        if (mouseRef.current.active) item.vx += Math.sin((performance.now() + item.id * 500) / 900) * 0.002;
       }
 
       for (let i = 0; i < items.length; i += 1) {
@@ -516,7 +482,7 @@ function CloudPlayground() {
   return (
     <div
       ref={containerRef}
-      className="absolute inset-0 z-10 hidden overflow-hidden lg:block"
+      className="absolute inset-0 z-40 hidden overflow-hidden lg:block"
       onPointerMove={(event) => {
         const rect = event.currentTarget.getBoundingClientRect();
         mouseRef.current = { x: event.clientX - rect.left, y: event.clientY - rect.top, active: true };
@@ -548,7 +514,7 @@ function CloudPlayground() {
               vy: Math.max(-5, Math.min(5, info.velocity.y * 0.008))
             });
           }}
-          className="cloud-blob absolute grid cursor-grab place-items-center bg-white px-8 text-center text-sm font-black uppercase text-graphite transition-colors hover:bg-pinkSoft active:cursor-grabbing"
+          className="cloud-blob absolute grid cursor-grab place-items-center px-8 text-center text-sm font-black uppercase text-graphite transition-transform active:cursor-grabbing"
           style={{ x: blob.x, y: blob.y, width: blob.w, height: blob.h }}
         >
           <span className="relative z-10 pointer-events-none">{blob.label}</span>
@@ -594,14 +560,14 @@ function ProductChooser({
 }
 
 function ColoringSlider() {
-  const [position, setPosition] = useState(54);
+  const [mode, setMode] = useState<"before" | "after">("after");
 
   return (
     <section className="mx-auto grid max-w-7xl gap-8 px-4 py-20 sm:px-6 lg:grid-cols-[0.75fr_1.25fr] lg:px-8">
       <div className="self-center">
         <p className="font-black uppercase text-pinkBrand">Фото → раскраска</p>
         <h2 className="mt-3 font-display text-4xl font-black uppercase sm:text-6xl">Из фото — в личную раскраску</h2>
-        <p className="mt-5 text-lg font-bold leading-relaxed text-graphite/65">Проведите ползунок. Идея становится подарком.</p>
+        <p className="mt-5 text-lg font-bold leading-relaxed text-graphite/65">Переключите до/после. Так фотография становится личной раскраской.</p>
         <a href="#ver2-order" className="magnetic mt-7 inline-flex rounded-full bg-pinkBrand px-7 py-4 font-black uppercase text-white shadow-sticker">
           Хочу такую раскраску
         </a>
@@ -609,20 +575,28 @@ function ColoringSlider() {
       <div className="relative overflow-hidden rounded-[2.5rem] bg-white p-4 shadow-paper">
         <div className="relative aspect-[4/3] overflow-hidden rounded-[2rem]">
           <Image src="/works/optimized/coloring-2.jpg" alt="Фото до превращения в раскраску" fill className="object-cover" />
-          <div className="absolute inset-0 overflow-hidden" style={{ clipPath: `inset(0 ${100 - position}% 0 0)` }}>
+          <motion.div
+            className="absolute inset-0 overflow-hidden"
+            animate={{ opacity: mode === "after" ? 1 : 0 }}
+            transition={{ duration: 0.28 }}
+          >
             <Image src="/works/optimized/coloring-2.jpg" alt="Контурная версия раскраски" fill className="object-cover grayscale contrast-200 brightness-125" />
             <div className="absolute inset-0 bg-white/35 mix-blend-screen" />
+          </motion.div>
+          <div className="absolute left-1/2 top-5 flex -translate-x-1/2 rounded-full bg-white/88 p-1 shadow-paper backdrop-blur">
+            {(["before", "after"] as const).map((item) => (
+              <button
+                key={item}
+                type="button"
+                onClick={() => setMode(item)}
+                className={`rounded-full px-5 py-3 text-xs font-black uppercase transition ${
+                  mode === item ? "bg-pinkBrand text-white shadow-sticker" : "text-graphite/60"
+                }`}
+              >
+                {item === "before" ? "До" : "После"}
+              </button>
+            ))}
           </div>
-          <div className="absolute inset-y-0 w-1 bg-pinkBrand shadow-sticker" style={{ left: `${position}%` }} />
-          <input
-            aria-label="Сравнить фото и раскраску"
-            type="range"
-            min={12}
-            max={88}
-            value={position}
-            onChange={(event) => setPosition(Number(event.target.value))}
-            className="absolute inset-x-6 bottom-6 accent-pinkBrand"
-          />
         </div>
       </div>
     </section>
@@ -676,14 +650,12 @@ function OrderBuilder({
   price,
   updateBuilder,
   chooseProduct,
-  toggleExtra,
   passToForm
 }: {
   builder: BuilderState;
   price: number;
   updateBuilder: (next: Partial<BuilderState>) => void;
   chooseProduct: (product: keyof typeof serviceMap) => void;
-  toggleExtra: (extra: ExtraOption) => void;
   passToForm: () => void;
 }) {
   return (
@@ -719,13 +691,9 @@ function OrderBuilder({
             </button>
           </div>
         </div>
-        <BuilderGroup title="Дополнительно">
-          {extraOptions.map((item) => (
-            <Chip key={item} active={builder.extras.includes(item)} onClick={() => toggleExtra(item)}>
-              {item}
-            </Chip>
-          ))}
-        </BuilderGroup>
+        <div className="mt-8 rounded-[2rem] bg-white/72 p-5 font-black text-graphite/60 shadow-paper backdrop-blur">
+          Бумагу, резку, ламинацию и упаковку подберем сами под результат. Вам нужно только выбрать, что хочется получить.
+        </div>
       </div>
 
       <aside className="sticky top-6 h-fit overflow-hidden rounded-[2.5rem] bg-graphite p-6 text-white shadow-paper">
@@ -736,15 +704,9 @@ function OrderBuilder({
           <p className="font-black uppercase text-pinkBrand">Чек печатается</p>
           <p className="mt-3 font-display text-3xl font-black uppercase">{builder.product}</p>
           <p className="mt-2 font-bold text-graphite/60">{builder.format} / {builder.quantity} шт.</p>
-          <div className="mt-4 flex flex-wrap gap-2">
-            <AnimatePresence>
-              {builder.extras.map((extra) => (
-                <motion.span key={extra} initial={{ scale: 0, rotate: -12 }} animate={{ scale: 1, rotate: -3 }} exit={{ scale: 0 }} className="rounded-full bg-pinkSoft px-3 py-2 text-xs font-black uppercase text-pinkBrand">
-                  {extra}
-                </motion.span>
-              ))}
-            </AnimatePresence>
-          </div>
+          <p className="mt-4 rounded-full bg-pinkSoft px-4 py-3 text-xs font-black uppercase text-pinkBrand">
+            Остальное подберем под вау-эффект
+          </p>
           <motion.p key={price} initial={{ y: 20, opacity: 0 }} animate={{ y: 0, opacity: 1 }} className="mt-6 font-display text-5xl font-black text-pinkBrand">
             {formatRub(price)}
           </motion.p>
@@ -757,48 +719,78 @@ function OrderBuilder({
   );
 }
 
-function ProcessTape({ processRef }: { processRef: React.RefObject<HTMLDivElement | null> }) {
-  const steps = [
-    ["Вы пишете", Send],
-    ["Мы уточняем", FileImage],
-    ["Печатаем", Printer],
-    ["Упаковываем", PackageCheck],
-    ["Вы забираете", Sparkles]
-  ] as const;
+function GiftMiniGame() {
+  const [score, setScore] = useState(42);
+  const tokens = ["вау", "нежно", "лично", "ярко", "в память"] as const;
 
   return (
-    <section ref={processRef} className="mx-auto max-w-7xl px-4 py-20 sm:px-6 lg:px-8">
-      <h2 className="max-w-3xl font-display text-4xl font-black uppercase sm:text-6xl">Как идея становится заказом</h2>
-      <div className="relative mt-14">
-        <div className="absolute left-0 top-10 h-3 w-full rounded-full bg-pinkSoft" />
-        <div className="process-tape absolute left-0 top-10 h-3 w-0 rounded-full bg-pinkBrand" />
-        <div className="grid gap-5 md:grid-cols-5">
-          {steps.map(([title, Icon], index) => (
-            <motion.div key={title} whileHover={{ y: -10, rotate: index % 2 ? 3 : -3 }} className="relative rounded-[1.5rem] bg-white p-5 shadow-paper">
-              <div className="mb-12 grid h-16 w-16 place-items-center rounded-full bg-pinkBrand text-white">
-                <Icon />
-              </div>
-              <h3 className="font-display text-xl font-black uppercase">{title}</h3>
-            </motion.div>
+    <section className="mx-auto grid max-w-7xl gap-8 px-4 py-20 sm:px-6 lg:grid-cols-[0.9fr_1.1fr] lg:px-8">
+      <div>
+        <p className="font-black uppercase text-pinkBrand">Мини-игра</p>
+        <h2 className="mt-2 font-display text-4xl font-black uppercase sm:text-6xl">Соберите эмоцию подарка</h2>
+        <p className="mt-5 text-lg font-bold text-graphite/62">
+          Нажимайте на ощущения. Чем выше заряд, тем ближе тот самый момент: “это сделали для меня”.
+        </p>
+      </div>
+      <div className="rounded-[2.5rem] bg-white/76 p-6 shadow-paper backdrop-blur">
+        <div className="mb-6 flex items-center justify-between gap-4">
+          <div>
+            <p className="text-sm font-black uppercase text-pinkBrand">Заряд радости</p>
+            <p className="font-display text-5xl font-black text-graphite">{score}%</p>
+          </div>
+          <div className="grid h-20 w-20 place-items-center rounded-full bg-pinkBrand text-white shadow-sticker">
+            <Heart fill="currentColor" size={34} />
+          </div>
+        </div>
+        <div className="h-5 overflow-hidden rounded-full bg-pinkSoft">
+          <motion.div className="h-full rounded-full bg-pinkBrand" animate={{ width: `${score}%` }} />
+        </div>
+        <div className="mt-6 flex flex-wrap gap-3">
+          {tokens.map((token, index) => (
+            <motion.button
+              key={token}
+              type="button"
+              whileTap={{ scale: 0.92 }}
+              onClick={() => setScore((value) => Math.min(100, value + 8 + index))}
+              className="rounded-full bg-graphite px-5 py-3 text-sm font-black uppercase text-white shadow-paper transition hover:bg-pinkBrand"
+            >
+              + {token}
+            </motion.button>
           ))}
         </div>
+        {score >= 90 && (
+          <motion.p initial={{ opacity: 0, y: 14 }} animate={{ opacity: 1, y: 0 }} className="mt-6 rounded-3xl bg-pinkBrand p-5 font-display text-2xl font-black uppercase text-white">
+            Вау собрано. Осталось напечатать.
+          </motion.p>
+        )}
       </div>
     </section>
   );
 }
 
-function StickerBenefits() {
-  const items = ["Смело", "Аккуратно", "С заботой", "Понятно"];
+function EmotionReasons() {
+  const items = [
+    ["Сначала улыбка", "Человек видит себя, свою семью или свой бренд в настоящей вещи."],
+    ["Потом вау", "Цвет, бумага, упаковка и детали собираются в аккуратный подарок."],
+    ["И хочется сохранить", "Это не просто распечатка, а маленький момент, который остается."]
+  ] as const;
+
   return (
-    <section className="paper-grid mx-auto max-w-7xl rounded-[2.5rem] bg-white px-4 py-20 sm:px-6 lg:px-8">
-      <h2 className="font-display text-4xl font-black uppercase sm:text-6xl">Почему с нами легко</h2>
-      <div className="mt-10 grid gap-5 md:grid-cols-4">
-        {items.map((item, index) => (
-          <motion.div key={item} whileHover={{ rotate: index % 2 ? -6 : 6, y: -10 }} className="peeled min-h-48 rounded-[1.5rem] bg-pinkBrand p-6 text-white shadow-sticker">
-            <p className="font-display text-3xl font-black uppercase">{item}</p>
-            <p className="mt-5 font-bold text-white/78">{["Ярко выделяем", "Следим за деталями", "Делаем как для себя", "Объясняем просто"][index]}</p>
-          </motion.div>
-        ))}
+    <section className="mx-auto max-w-7xl px-4 py-20 sm:px-6 lg:px-8">
+      <div className="rounded-[2.5rem] bg-graphite p-6 text-white shadow-paper sm:p-9">
+        <p className="font-black uppercase text-pinkSoft">Не про печать. Про ощущение.</p>
+        <h2 className="mt-2 max-w-4xl font-display text-4xl font-black uppercase sm:text-6xl">Почему это работает эмоционально</h2>
+        <div className="mt-10 grid gap-5 md:grid-cols-3">
+          {items.map(([title, text], index) => (
+            <motion.div key={title} whileHover={{ y: -10, rotate: index % 2 ? 2 : -2 }} className="peeled min-h-64 rounded-[2rem] bg-white p-6 text-graphite shadow-sticker">
+              <div className="mb-10 grid h-16 w-16 place-items-center rounded-full bg-pinkBrand text-white">
+                {index === 0 ? <Heart fill="currentColor" /> : index === 1 ? <Sparkles /> : <Gift />}
+              </div>
+              <p className="font-display text-3xl font-black uppercase">{title}</p>
+              <p className="mt-4 font-bold leading-relaxed text-graphite/62">{text}</p>
+            </motion.div>
+          ))}
+        </div>
       </div>
     </section>
   );
