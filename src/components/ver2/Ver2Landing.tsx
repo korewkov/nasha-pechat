@@ -154,6 +154,10 @@ type CloudItem = {
   w: number;
   h: number;
   dragging: boolean;
+  hovered: boolean;
+  lastX: number;
+  lastY: number;
+  phase: number;
 };
 
 function optimizedWorkImage(path: string) {
@@ -387,7 +391,6 @@ function HeroScene() {
 function CloudPlayground() {
   const containerRef = useRef<HTMLDivElement>(null);
   const blobsRef = useRef<CloudItem[]>([]);
-  const mouseRef = useRef({ x: -999, y: -999, active: false });
   const [blobs, setBlobs] = useState<CloudItem[]>([]);
 
   useEffect(() => {
@@ -397,19 +400,32 @@ function CloudPlayground() {
 
     const seed = () => {
       const rect = container.getBoundingClientRect();
+      const anchors = [
+        [0.06, 0.2],
+        [0.72, 0.18],
+        [0.15, 0.68],
+        [0.78, 0.62],
+        [0.42, 0.24],
+        [0.52, 0.73]
+      ];
       const next = cloudLabels.map((label, index) => {
         const w = index % 2 ? 196 : 220;
         const h = 92;
+        const [ax, ay] = anchors[index] ?? [0.5, 0.5];
         return {
           id: index,
           label,
-          x: 40 + ((index * 181) % Math.max(240, rect.width - w - 80)),
-          y: 130 + ((index * 113) % Math.max(220, rect.height - h - 190)),
-          vx: (index % 2 ? 0.34 : -0.3) + index * 0.025,
-          vy: (index % 3 ? -0.24 : 0.28),
+          x: Math.max(18, Math.min(rect.width - w - 18, ax * (rect.width - w))),
+          y: Math.max(92, Math.min(rect.height - h - 28, ay * (rect.height - h))),
+          vx: (index % 2 ? 0.9 : -0.82) + index * 0.035,
+          vy: (index % 3 ? -0.62 : 0.7),
           w,
           h,
-          dragging: false
+          dragging: false,
+          hovered: false,
+          lastX: 0,
+          lastY: 0,
+          phase: index * 1.7
         };
       });
       blobsRef.current = next;
@@ -419,26 +435,29 @@ function CloudPlayground() {
     const tick = () => {
       const rect = container.getBoundingClientRect();
       const items = blobsRef.current;
+      const time = performance.now() / 1000;
       for (const item of items) {
         if (!item.dragging) {
+          item.vx += Math.sin(time * 0.9 + item.phase) * 0.006;
+          item.vy += Math.cos(time * 0.75 + item.phase) * 0.006;
           item.x += item.vx;
           item.y += item.vy;
-          item.vx *= 0.997;
-          item.vy *= 0.997;
-          if (Math.abs(item.vx) < 0.12) item.vx += item.id % 2 ? 0.018 : -0.018;
-          if (Math.abs(item.vy) < 0.1) item.vy += item.id % 3 ? -0.014 : 0.014;
+          item.vx *= 0.999;
+          item.vy *= 0.999;
+          if (Math.abs(item.vx) < 0.42) item.vx += item.id % 2 ? 0.03 : -0.03;
+          if (Math.abs(item.vy) < 0.34) item.vy += item.id % 3 ? -0.026 : 0.026;
+          item.vx = Math.max(-1.55, Math.min(1.55, item.vx));
+          item.vy = Math.max(-1.25, Math.min(1.25, item.vy));
         }
 
         if (item.x < 16 || item.x + item.w > rect.width - 16) {
-          item.vx *= -0.92;
+          item.vx *= -0.96;
           item.x = Math.max(16, Math.min(rect.width - item.w - 16, item.x));
         }
         if (item.y < 84 || item.y + item.h > rect.height - 28) {
-          item.vy *= -0.92;
+          item.vy *= -0.96;
           item.y = Math.max(84, Math.min(rect.height - item.h - 28, item.y));
         }
-
-        if (mouseRef.current.active) item.vx += Math.sin((performance.now() + item.id * 500) / 900) * 0.002;
       }
 
       for (let i = 0; i < items.length; i += 1) {
@@ -453,10 +472,10 @@ function CloudPlayground() {
             const push = (minDistance - distance) / minDistance;
             const nx = dx / distance;
             const ny = dy / distance;
-            a.vx += nx * push * 0.42;
-            a.vy += ny * push * 0.42;
-            b.vx -= nx * push * 0.42;
-            b.vy -= ny * push * 0.42;
+            a.vx += nx * push * 0.34;
+            a.vy += ny * push * 0.34;
+            b.vx -= nx * push * 0.34;
+            b.vy -= ny * push * 0.34;
           }
         }
       }
@@ -480,45 +499,48 @@ function CloudPlayground() {
   }
 
   return (
-    <div
-      ref={containerRef}
-      className="absolute inset-0 z-40 hidden overflow-hidden lg:block"
-      onPointerMove={(event) => {
-        const rect = event.currentTarget.getBoundingClientRect();
-        mouseRef.current = { x: event.clientX - rect.left, y: event.clientY - rect.top, active: true };
-      }}
-      onPointerLeave={() => {
-        mouseRef.current.active = false;
-      }}
-    >
+    <div ref={containerRef} className="absolute inset-0 z-40 hidden overflow-hidden lg:block">
       {blobs.map((blob) => (
-        <motion.div
+        <div
           key={blob.id}
-          drag
-          dragMomentum={false}
-          whileHover={{ scale: 1.08 }}
-          onDragStart={() => updateBlob(blob.id, { dragging: true })}
-          onDrag={(_, info) => {
-            const current = blobsRef.current.find((item) => item.id === blob.id) ?? blob;
+          onPointerEnter={() => updateBlob(blob.id, { hovered: true })}
+          onPointerLeave={() => updateBlob(blob.id, { hovered: false })}
+          onPointerDown={(event) => {
+            event.currentTarget.setPointerCapture(event.pointerId);
+            updateBlob(blob.id, { dragging: true, lastX: event.clientX, lastY: event.clientY, hovered: true });
+          }}
+          onPointerMove={(event) => {
+            const current = blobsRef.current.find((item) => item.id === blob.id);
+            if (!current?.dragging) return;
+            const dx = event.clientX - current.lastX;
+            const dy = event.clientY - current.lastY;
             updateBlob(blob.id, {
-              x: current.x + info.delta.x,
-              y: current.y + info.delta.y,
-              vx: info.delta.x * 0.35,
-              vy: info.delta.y * 0.35
+              x: current.x + dx,
+              y: current.y + dy,
+              vx: Math.max(-3, Math.min(3, dx * 0.24)),
+              vy: Math.max(-3, Math.min(3, dy * 0.24)),
+              lastX: event.clientX,
+              lastY: event.clientY
             });
           }}
-          onDragEnd={(_, info) => {
+          onPointerUp={(event) => {
+            event.currentTarget.releasePointerCapture(event.pointerId);
+            const current = blobsRef.current.find((item) => item.id === blob.id) ?? blob;
             updateBlob(blob.id, {
               dragging: false,
-              vx: Math.max(-5, Math.min(5, info.velocity.x * 0.008)),
-              vy: Math.max(-5, Math.min(5, info.velocity.y * 0.008))
+              vx: Math.max(-1.8, Math.min(1.8, current.vx || (blob.id % 2 ? 0.9 : -0.9))),
+              vy: Math.max(-1.4, Math.min(1.4, current.vy || (blob.id % 3 ? -0.7 : 0.7)))
             });
           }}
           className="cloud-blob absolute grid cursor-grab place-items-center px-8 text-center text-sm font-black uppercase text-graphite transition-transform active:cursor-grabbing"
-          style={{ x: blob.x, y: blob.y, width: blob.w, height: blob.h }}
+          style={{
+            width: blob.w,
+            height: blob.h,
+            transform: `translate3d(${blob.x}px, ${blob.y}px, 0) scale(${blob.hovered ? 1.08 : 1})`
+          }}
         >
           <span className="relative z-10 pointer-events-none">{blob.label}</span>
-        </motion.div>
+        </div>
       ))}
     </div>
   );
@@ -560,7 +582,8 @@ function ProductChooser({
 }
 
 function ColoringSlider() {
-  const [mode, setMode] = useState<"before" | "after">("after");
+  const [position, setPosition] = useState(58);
+  const mode = position < 50 ? "До" : "После";
 
   return (
     <section className="mx-auto grid max-w-7xl gap-8 px-4 py-20 sm:px-6 lg:grid-cols-[0.75fr_1.25fr] lg:px-8">
@@ -575,25 +598,41 @@ function ColoringSlider() {
       <div className="relative overflow-hidden rounded-[2.5rem] bg-white p-4 shadow-paper">
         <div className="relative aspect-[4/3] overflow-hidden rounded-[2rem]">
           <Image src="/works/optimized/coloring-2.jpg" alt="Фото до превращения в раскраску" fill className="object-cover" />
-          <motion.div
+          <div
             className="absolute inset-0 overflow-hidden"
-            animate={{ opacity: mode === "after" ? 1 : 0 }}
-            transition={{ duration: 0.28 }}
+            style={{ clipPath: `inset(0 ${100 - position}% 0 0)` }}
           >
             <Image src="/works/optimized/coloring-2.jpg" alt="Контурная версия раскраски" fill className="object-cover grayscale contrast-200 brightness-125" />
             <div className="absolute inset-0 bg-white/35 mix-blend-screen" />
-          </motion.div>
-          <div className="absolute left-1/2 top-5 flex -translate-x-1/2 rounded-full bg-white/88 p-1 shadow-paper backdrop-blur">
-            {(["before", "after"] as const).map((item) => (
+          </div>
+          <div
+            className="pointer-events-none absolute inset-y-5 z-10 w-1 rounded-full bg-pinkBrand shadow-sticker"
+            style={{ left: `${position}%` }}
+          >
+            <span className="absolute left-1/2 top-1/2 grid h-12 w-12 -translate-x-1/2 -translate-y-1/2 place-items-center rounded-full bg-pinkBrand text-lg font-black text-white shadow-sticker">
+              ↔
+            </span>
+          </div>
+          <input
+            aria-label="Двигать разделитель до и после"
+            className="absolute inset-0 z-20 h-full w-full cursor-ew-resize opacity-0"
+            type="range"
+            min={0}
+            max={100}
+            value={position}
+            onChange={(event) => setPosition(Number(event.target.value))}
+          />
+          <div className="absolute left-1/2 top-5 z-30 flex -translate-x-1/2 rounded-full bg-white/88 p-1 shadow-paper backdrop-blur">
+            {(["До", "После"] as const).map((item) => (
               <button
                 key={item}
                 type="button"
-                onClick={() => setMode(item)}
+                onClick={() => setPosition(item === "До" ? 10 : 90)}
                 className={`rounded-full px-5 py-3 text-xs font-black uppercase transition ${
                   mode === item ? "bg-pinkBrand text-white shadow-sticker" : "text-graphite/60"
                 }`}
               >
-                {item === "before" ? "До" : "После"}
+                {item}
               </button>
             ))}
           </div>
@@ -720,49 +759,95 @@ function OrderBuilder({
 }
 
 function GiftMiniGame() {
-  const [score, setScore] = useState(42);
-  const tokens = ["вау", "нежно", "лично", "ярко", "в память"] as const;
+  const [clicks, setClicks] = useState(0);
+  const targetClicks = 18;
+  const progress = Math.min(100, Math.round((clicks / targetClicks) * 100));
+  const unlocked = progress >= 100;
 
   return (
-    <section className="mx-auto grid max-w-7xl gap-8 px-4 py-20 sm:px-6 lg:grid-cols-[0.9fr_1.1fr] lg:px-8">
-      <div>
+    <section className="mx-auto max-w-7xl px-4 py-20 sm:px-6 lg:px-8">
+      <div className="mb-8 max-w-3xl">
         <p className="font-black uppercase text-pinkBrand">Мини-игра</p>
-        <h2 className="mt-2 font-display text-4xl font-black uppercase sm:text-6xl">Соберите эмоцию подарка</h2>
+        <h2 className="mt-2 font-display text-4xl font-black uppercase sm:text-6xl">Нажмите на вау</h2>
         <p className="mt-5 text-lg font-bold text-graphite/62">
-          Нажимайте на ощущения. Чем выше заряд, тем ближе тот самый момент: “это сделали для меня”.
+          Добейте шкалу радости до конца — внутри спрятан подарок для первого заказа.
         </p>
       </div>
-      <div className="rounded-[2.5rem] bg-white/76 p-6 shadow-paper backdrop-blur">
-        <div className="mb-6 flex items-center justify-between gap-4">
-          <div>
-            <p className="text-sm font-black uppercase text-pinkBrand">Заряд радости</p>
-            <p className="font-display text-5xl font-black text-graphite">{score}%</p>
-          </div>
-          <div className="grid h-20 w-20 place-items-center rounded-full bg-pinkBrand text-white shadow-sticker">
-            <Heart fill="currentColor" size={34} />
-          </div>
+      <div className="relative min-h-[540px] overflow-hidden rounded-[2.75rem] bg-pinkBrand p-5 shadow-sticker sm:p-8">
+        <svg className="pointer-events-none absolute inset-0 h-full w-full" viewBox="0 0 100 100" preserveAspectRatio="none">
+          <rect x="2" y="2" width="96" height="96" rx="7" fill="none" stroke="rgba(255,255,255,.34)" strokeWidth="1.8" />
+          <motion.rect
+            x="2"
+            y="2"
+            width="96"
+            height="96"
+            rx="7"
+            fill="none"
+            stroke="white"
+            strokeWidth="1.8"
+            pathLength="100"
+            strokeDasharray="100"
+            animate={{ strokeDashoffset: 100 - progress }}
+            transition={{ duration: 0.22 }}
+          />
+        </svg>
+
+        <div className="relative grid min-h-[480px] place-items-center overflow-hidden rounded-[2.1rem] bg-white">
+          <motion.div
+            initial={false}
+            animate={unlocked ? { scale: 1, opacity: 1 } : { scale: 0.9, opacity: 0.22 }}
+            className="relative z-10 grid place-items-center text-center"
+          >
+            <div className="relative grid h-48 w-52 place-items-center rounded-[2rem] bg-pinkBrand text-white shadow-sticker">
+              <Gift size={82} />
+              <div className="absolute left-1/2 top-0 h-full w-8 -translate-x-1/2 bg-white/25" />
+              <div className="absolute left-0 top-1/2 h-8 w-full -translate-y-1/2 bg-white/25" />
+            </div>
+            <p className="mt-7 font-display text-4xl font-black uppercase text-graphite">Скидка 10%</p>
+            <p className="mt-2 text-lg font-black text-graphite/62">на первый заказ</p>
+            <p className="mt-5 rounded-full bg-pinkSoft px-6 py-3 font-display text-2xl font-black uppercase text-pinkBrand">
+              Промокод: НАШИ10
+            </p>
+            <a href="#ver2-order" className="magnetic mt-6 rounded-full bg-graphite px-7 py-4 font-black uppercase text-white">
+              Забрать подарок
+            </a>
+          </motion.div>
+
+          <AnimatePresence>
+            {!unlocked && (
+              <>
+                <motion.div
+                  className="absolute inset-y-0 left-0 z-20 w-1/2 origin-left bg-pinkBrand"
+                  exit={{ x: "-115%", rotate: -9, opacity: 0 }}
+                  transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
+                />
+                <motion.div
+                  className="absolute inset-y-0 right-0 z-20 w-1/2 origin-right bg-pinkBrand"
+                  exit={{ x: "115%", rotate: 9, opacity: 0 }}
+                  transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
+                />
+                <div className="absolute inset-0 z-30 grid place-items-center">
+                  <div className="text-center">
+                    <motion.button
+                      type="button"
+                      whileTap={{ scale: 0.88, rotate: -2 }}
+                      animate={{ scale: [1, 1.04, 1] }}
+                      transition={{ repeat: Infinity, duration: 1.4 }}
+                      onClick={() => setClicks((value) => Math.min(targetClicks, value + 1))}
+                      className="rounded-full bg-white px-16 py-8 font-display text-5xl font-black uppercase text-pinkBrand shadow-paper"
+                    >
+                      Вау
+                    </motion.button>
+                    <p className="mt-7 font-display text-4xl font-black text-white">{progress}%</p>
+                    <p className="mt-2 text-sm font-black uppercase tracking-normal text-white/78">
+                      Нажмите еще {Math.max(0, targetClicks - clicks)} раз
+                    </p>
+                  </div>
+                </div>
+              </>
+            )}
+          </AnimatePresence>
         </div>
-        <div className="h-5 overflow-hidden rounded-full bg-pinkSoft">
-          <motion.div className="h-full rounded-full bg-pinkBrand" animate={{ width: `${score}%` }} />
-        </div>
-        <div className="mt-6 flex flex-wrap gap-3">
-          {tokens.map((token, index) => (
-            <motion.button
-              key={token}
-              type="button"
-              whileTap={{ scale: 0.92 }}
-              onClick={() => setScore((value) => Math.min(100, value + 8 + index))}
-              className="rounded-full bg-graphite px-5 py-3 text-sm font-black uppercase text-white shadow-paper transition hover:bg-pinkBrand"
-            >
-              + {token}
-            </motion.button>
-          ))}
-        </div>
-        {score >= 90 && (
-          <motion.p initial={{ opacity: 0, y: 14 }} animate={{ opacity: 1, y: 0 }} className="mt-6 rounded-3xl bg-pinkBrand p-5 font-display text-2xl font-black uppercase text-white">
-            Вау собрано. Осталось напечатать.
-          </motion.p>
-        )}
       </div>
     </section>
   );
