@@ -602,13 +602,12 @@ function ColoringSlider() {
       </div>
       <div className="relative overflow-hidden rounded-[1.75rem] bg-white p-2 shadow-paper sm:p-4 lg:rounded-[2.5rem]">
         <div className="relative aspect-[4/3] overflow-hidden rounded-[1.35rem] lg:rounded-[2rem]">
-          <Image src="/works/optimized/coloring-2.jpg" alt="Фото до превращения в раскраску" fill className="object-cover" />
+          <Image src="/images/coloring/photo-before.png" alt="Фото до превращения в раскраску" fill className="object-cover" />
           <div
             className="absolute inset-0 overflow-hidden"
             style={{ clipPath: `inset(0 ${100 - position}% 0 0)` }}
           >
-            <Image src="/works/optimized/coloring-2.jpg" alt="Контурная версия раскраски" fill className="object-cover grayscale contrast-200 brightness-125" />
-            <div className="absolute inset-0 bg-white/35 mix-blend-screen" />
+            <Image src="/images/coloring/coloring-after.png" alt="Контурная версия раскраски" fill className="object-cover" />
           </div>
           <div
             className="pointer-events-none absolute inset-y-4 z-10 w-1.5 rounded-full bg-pinkBrand shadow-sticker"
