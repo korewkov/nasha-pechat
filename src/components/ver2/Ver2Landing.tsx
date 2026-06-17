@@ -118,10 +118,10 @@ const initialBuilder: BuilderState = {
 };
 
 const heroFlowers = [
-  { src: "/brand/flowers/flower-1.svg", className: "left-[5%] top-32 h-24 w-24 opacity-80 sm:h-32 sm:w-32 lg:left-[9%] lg:top-40", delay: 0 },
-  { src: "/brand/flowers/flower-2.svg", className: "right-[6%] top-44 hidden h-28 w-28 opacity-75 sm:block lg:right-[11%] lg:top-36 lg:h-36 lg:w-36", delay: 0.4 },
-  { src: "/brand/flowers/flower-3.svg", className: "bottom-24 left-[12%] hidden h-24 w-24 opacity-70 md:block lg:h-32 lg:w-32", delay: 0.9 },
-  { src: "/brand/flowers/flower-4.svg", className: "bottom-28 right-[10%] h-20 w-20 opacity-75 sm:h-28 sm:w-28 lg:h-36 lg:w-36", delay: 1.2 }
+  { src: "/brand/flowers/flower-1.svg", className: "left-[5%] top-28 h-28 w-28 opacity-85 sm:h-40 sm:w-40 lg:left-[8%] lg:top-24 lg:h-48 lg:w-48" },
+  { src: "/brand/flowers/flower-2.svg", className: "right-[5%] top-36 hidden h-36 w-36 opacity-80 sm:block lg:right-[8%] lg:top-20 lg:h-56 lg:w-56" },
+  { src: "/brand/flowers/flower-3.svg", className: "bottom-8 left-[8%] hidden h-28 w-28 opacity-75 md:block lg:bottom-[-5rem] lg:h-44 lg:w-44" },
+  { src: "/brand/flowers/flower-4.svg", className: "bottom-10 right-[8%] h-24 w-24 opacity-80 sm:h-36 sm:w-36 lg:bottom-[-4rem] lg:h-48 lg:w-48" }
 ] as const;
 
 const tapeCards = [
@@ -404,15 +404,12 @@ function HeroScene() {
           <motion.div
             key={flower.src}
             className={`absolute ${flower.className}`}
-            initial={{ opacity: 0, scale: 0.92, rotate: index % 2 ? -8 : 8 }}
             animate={{
-              opacity: 1,
-              y: index % 2 ? [0, -12, 0] : [0, 12, 0],
-              x: index % 2 ? [0, 8, 0] : [0, -8, 0],
-              rotate: index % 2 ? [-4, 4, -4] : [4, -4, 4]
+              y: index % 2 ? [0, -8, 0] : [0, 8, 0],
+              x: index % 2 ? [0, 6, 0] : [0, -6, 0],
+              rotate: index % 2 ? [-3, 3, -3] : [3, -3, 3]
             }}
             transition={{
-              delay: flower.delay,
               duration: 10 + index,
               repeat: Infinity,
               ease: "easeInOut"
