@@ -22,14 +22,21 @@ import {
   Send,
   ShoppingBag,
   Sparkles,
-  Wrench
+  Wrench,
+  X
 } from "lucide-react";
 import {
   calculateOrderPrice,
   serviceFormatOptions,
+  type BusinessCardSides,
+  type DocumentJobType,
   type ExtraOption,
+  type LayoutPurpose,
+  type LayoutType,
   type PaperType,
+  type PostcardDesign,
   type PrintFormat,
+  type PrintColor,
   type ServiceType
 } from "@/config/pricing.config";
 import { formatRub } from "@/lib/utils";
@@ -39,7 +46,8 @@ const serviceMap: Record<string, ServiceType> = {
   Фото: "Фото на документы",
   Визитки: "Визитки",
   Открытки: "Открытки",
-  Документы: "Документы"
+  Документы: "Документы",
+  Макеты: "Макеты"
 };
 
 const faqItems = [
@@ -84,6 +92,13 @@ type BuilderState = {
   quantity: number;
   paper: PaperType;
   extras: ExtraOption[];
+  sides: BusinessCardSides;
+  postcardDesign: PostcardDesign;
+  hasEnvelope: boolean;
+  documentJob: DocumentJobType;
+  printColor: PrintColor;
+  layoutType: LayoutType;
+  layoutPurpose: LayoutPurpose;
 };
 
 const initialBuilder: BuilderState = {
@@ -92,59 +107,82 @@ const initialBuilder: BuilderState = {
   format: "A5",
   quantity: 5,
   paper: "плотная матовая",
-  extras: []
+  extras: [],
+  sides: "односторонние",
+  postcardDesign: "свой макет",
+  hasEnvelope: false,
+  documentJob: "печать",
+  printColor: "ч/б",
+  layoutType: "подготовка к печати",
+  layoutPurpose: "открытка"
 };
 
-const cloudLabels = ["Раскраска", "Фото", "Визитки", "Открытки", "Документы", "Макеты"] as const;
+const heroFlowers = [
+  { src: "/brand/flowers/flower-1.svg", className: "left-[5%] top-32 h-24 w-24 opacity-80 sm:h-32 sm:w-32 lg:left-[9%] lg:top-40", delay: 0 },
+  { src: "/brand/flowers/flower-2.svg", className: "right-[6%] top-44 hidden h-28 w-28 opacity-75 sm:block lg:right-[11%] lg:top-36 lg:h-36 lg:w-36", delay: 0.4 },
+  { src: "/brand/flowers/flower-3.svg", className: "bottom-24 left-[12%] hidden h-24 w-24 opacity-70 md:block lg:h-32 lg:w-32", delay: 0.9 },
+  { src: "/brand/flowers/flower-4.svg", className: "bottom-28 right-[10%] h-20 w-20 opacity-75 sm:h-28 sm:w-28 lg:h-36 lg:w-36", delay: 1.2 }
+] as const;
 
 const tapeCards = [
   {
     title: "Раскраска по фото",
-    description: "Превратим ваши фотографии в персональную раскраску для ребёнка или взрослого.",
+    description: "Соберём персональную книжку по вашим снимкам: обложка, страницы, печать и аккуратная сборка.",
     price: "от 1000 ₽",
     image: "/images/tape/tape-coloring.jpeg"
   },
   {
     title: "Фото на документы",
-    description: "Фото 3×4, 3,5×4,5 и другие форматы для документов.",
+    description: "Подготовим снимок под нужный формат и напечатаем листом или отдельными фотографиями.",
     price: "от 300 ₽",
     image: "/images/tape/tape-doc-photo.jpeg"
   },
   {
     title: "Визитки",
-    description: "Аккуратные визитки для себя, мастера или малого бизнеса.",
+    description: "Поможем с макетом, подберём бумагу и напечатаем небольшой тираж для мастера, бренда или события.",
     price: "от 500 ₽",
     image: "/images/tape/tape-business-cards.jpeg"
   },
   {
     title: "Открытки",
-    description: "Открытки для подарков, поздравлений и тёплых слов.",
+    description: "Сделаем карточку с вашим текстом, фото или иллюстрацией. Можно заказать от одной штуки.",
     price: "от 200 ₽",
     image: "/images/tape/tape-postcards.jpeg"
   },
   {
     title: "Документы",
-    description: "Печать документов, анкет, файлов и учебных материалов.",
+    description: "Распечатаем, отсканируем или заламинируем материалы для учёбы, работы и бытовых задач.",
     price: "от 100 ₽",
     image: "/images/tape/tape-documents.jpeg"
+  },
+  {
+    title: "Макеты",
+    description: "Подготовим файл к печати: поправим размер, поля, качество, текст и расположение элементов.",
+    price: "от 300 ₽",
+    image: "/works/optimized/printing-1.jpg"
   }
 ] as const;
 
-type CloudItem = {
-  id: number;
-  label: string;
-  x: number;
-  y: number;
-  vx: number;
-  vy: number;
-  w: number;
-  h: number;
-  dragging: boolean;
-  hovered: boolean;
-  lastX: number;
-  lastY: number;
-  phase: number;
-};
+const galleryItems = [
+  { src: "/works/optimized/coloring-1.jpg", alt: "Персональная раскраска по фото", category: "Раскраски" },
+  { src: "/works/optimized/photo-1.jpg", alt: "Фото на документы", category: "Фото" },
+  { src: "/works/optimized/business-1.jpg", alt: "Партия визиток", category: "Визитки" },
+  { src: "/works/optimized/card-1.jpg", alt: "Печатные открытки", category: "Открытки" },
+  { src: "/works/optimized/printing-1.jpg", alt: "Печать документов", category: "Документы" },
+  { src: "/works/optimized/coloring-2.jpg", alt: "Разворот раскраски", category: "Раскраски" },
+  { src: "/works/optimized/card-2.jpg", alt: "Открытки с иллюстрацией", category: "Открытки" },
+  { src: "/works/optimized/packaging-1.jpg", alt: "Аккуратная упаковка заказа", category: "Документы" },
+  { src: "/works/optimized/stickers-1.jpg", alt: "Наклейки и небольшая полиграфия", category: "Документы" },
+  { src: "/works/optimized/packaging-2.jpg", alt: "Готовый заказ перед выдачей", category: "Документы" }
+] as const;
+
+const galleryFilters = ["Все", "Раскраски", "Фото", "Визитки", "Открытки", "Документы"] as const;
+
+const businessCardQuantities = [50, 100, 200] as const;
+const postcardQuantities = [1, 5, 10, 20] as const;
+const documentJobs: DocumentJobType[] = ["печать", "копия", "скан", "ламинация"];
+const layoutTypes: LayoutType[] = ["лёгкая правка", "подготовка к печати", "макет с нуля"];
+const layoutPurposes: LayoutPurpose[] = ["открытка", "визитка", "листовка", "другой макет"];
 
 export default function Ver2Landing() {
   const galleryRef = useRef<HTMLDivElement>(null);
@@ -186,14 +224,6 @@ export default function Ver2Landing() {
         });
       }
 
-      gsap.to(".hero-depth", {
-        y: 140,
-        scale: 0.92,
-        opacity: 0.72,
-        ease: "none",
-        scrollTrigger: { trigger: ".ver2-hero", start: "top top", end: "bottom top", scrub: true }
-      });
-
     });
 
     return () => {
@@ -211,12 +241,34 @@ export default function Ver2Landing() {
     setBuilder((current) => {
       const service = serviceMap[product];
       const availableFormats = serviceFormatOptions[service];
+      const nextQuantity =
+        service === "Раскраска по фото"
+          ? Math.max(5, current.quantity)
+          : service === "Визитки"
+            ? 50
+            : service === "Открытки"
+              ? 1
+              : service === "Макеты"
+                ? 1
+                : current.quantity;
       return {
         ...current,
         product,
         service,
         format: availableFormats.includes(current.format) ? current.format : availableFormats[0],
-        quantity: service === "Раскраска по фото" ? Math.max(5, current.quantity) : current.quantity
+        quantity: nextQuantity,
+        paper:
+          service === "Визитки" || service === "Открытки"
+            ? "обычная"
+            : current.paper,
+        extras: [],
+        sides: "односторонние",
+        postcardDesign: "свой макет",
+        hasEnvelope: false,
+        documentJob: "печать",
+        printColor: "ч/б",
+        layoutType: "подготовка к печати",
+        layoutPurpose: "открытка"
       };
     });
   }
@@ -225,6 +277,15 @@ export default function Ver2Landing() {
     setCopiedToForm(true);
     document.querySelector("#ver2-order")?.scrollIntoView({ behavior: "smooth", block: "start" });
     window.setTimeout(() => setCopiedToForm(false), 1800);
+  }
+
+  function toggleExtra(option: ExtraOption) {
+    setBuilder((current) => ({
+      ...current,
+      extras: current.extras.includes(option)
+        ? current.extras.filter((item) => item !== option)
+        : [...current.extras, option]
+    }));
   }
 
   return (
@@ -238,6 +299,7 @@ export default function Ver2Landing() {
       />
       <HeroScene />
       <HorizontalGallery galleryRef={galleryRef} trackRef={galleryTrackRef} />
+      <WorksShowcase />
       <ColoringSlider />
       <ProcessReels />
       <OrderBuilder
@@ -245,6 +307,7 @@ export default function Ver2Landing() {
         price={price.total}
         updateBuilder={updateBuilder}
         chooseProduct={chooseProduct}
+        toggleExtra={toggleExtra}
         passToForm={passToForm}
       />
       <GiftMiniGame />
@@ -334,20 +397,31 @@ function ProcessReels() {
 
 function HeroScene() {
   return (
-    <section className="ver2-hero relative isolate min-h-[92svh] overflow-hidden px-4 pb-20 pt-4 sm:px-6 lg:min-h-screen lg:px-8 lg:py-6">
-      <Image
-        src="/generated/optimized/hero-print-products.jpg"
-        alt="Печатные вещи Наша печать"
-        fill
-        className="hero-depth -z-20 object-cover opacity-70"
-        priority
-        sizes="100vw"
-      />
-      <div className="absolute inset-0 -z-10 bg-gradient-to-br from-white/95 via-white/68 to-pinkSoft/76" />
-      <div className="absolute inset-x-0 bottom-0 -z-10 h-48 bg-gradient-to-t from-milk to-transparent" />
-      <CloudPlayground />
-      <div className="pointer-events-none absolute left-[7%] top-28 z-10 h-16 w-24 rotate-[-10deg] rounded-2xl bg-white shadow-paper md:hidden" />
-      <div className="pointer-events-none absolute right-3 top-48 z-10 h-24 w-20 rotate-[12deg] rounded-[1.5rem] bg-pinkSoft shadow-paper md:hidden" />
+    <section className="ver2-hero relative isolate min-h-[92svh] overflow-hidden bg-white px-4 pb-20 pt-8 sm:px-6 sm:pt-10 lg:min-h-screen lg:px-8 lg:py-10">
+      <div className="absolute inset-x-0 bottom-0 -z-20 h-56 bg-gradient-to-t from-milk to-transparent" />
+      <div className="pointer-events-none absolute inset-0 -z-10 overflow-hidden">
+        {heroFlowers.map((flower, index) => (
+          <motion.div
+            key={flower.src}
+            className={`absolute ${flower.className}`}
+            initial={{ opacity: 0, scale: 0.92, rotate: index % 2 ? -8 : 8 }}
+            animate={{
+              opacity: 1,
+              y: index % 2 ? [0, -12, 0] : [0, 12, 0],
+              x: index % 2 ? [0, 8, 0] : [0, -8, 0],
+              rotate: index % 2 ? [-4, 4, -4] : [4, -4, 4]
+            }}
+            transition={{
+              delay: flower.delay,
+              duration: 10 + index,
+              repeat: Infinity,
+              ease: "easeInOut"
+            }}
+          >
+            <img src={flower.src} alt="" className="h-full w-full object-contain" draggable={false} />
+          </motion.div>
+        ))}
+      </div>
       <nav className="fixed inset-x-4 top-4 z-[100] mx-auto flex max-w-7xl items-center justify-between rounded-full bg-white px-3 py-3 shadow-paper sm:px-5 sm:py-4">
         <a href="/" className="relative h-11 w-[min(54vw,16rem)] overflow-hidden sm:h-14 sm:w-64" aria-label="Наша печать">
           <Image src="/brand/logos/logo-wide-alt.svg" alt="Наша печать" fill className="object-contain object-left" priority />
@@ -362,7 +436,7 @@ function HeroScene() {
         </a>
       </nav>
 
-      <div className="relative z-20 mx-auto flex min-h-[calc(92svh-6rem)] max-w-7xl items-center justify-center py-[clamp(3.5rem,14vw,5rem)] text-center lg:min-h-[calc(100vh-7.5rem)] lg:py-20">
+      <div className="relative z-20 mx-auto flex min-h-[calc(92svh-7.5rem)] max-w-7xl items-center justify-center py-[clamp(5rem,15vw,7rem)] text-center lg:min-h-[calc(100vh-8.5rem)] lg:py-28">
         <div className="select-none">
           <div className="space-y-2 overflow-hidden font-display text-[clamp(2.35rem,12.5vw,7.4rem)] font-black uppercase leading-[0.9] tracking-normal sm:text-[clamp(3rem,7.6vw,7.4rem)]">
             {["Печатаем красиво.", "Делаем с душой."].map((line, index) => (
@@ -396,183 +470,6 @@ function HeroScene() {
         </div>
       </div>
     </section>
-  );
-}
-
-function CloudPlayground() {
-  const containerRef = useRef<HTMLDivElement>(null);
-  const blobsRef = useRef<CloudItem[]>([]);
-  const [blobs, setBlobs] = useState<CloudItem[]>([]);
-
-  useEffect(() => {
-    const container = containerRef.current;
-    if (!container) return;
-    let rafId = 0;
-
-    const seed = () => {
-      const rect = container.getBoundingClientRect();
-      const anchors = [
-        [0.04, 0.22],
-        [0.78, 0.2],
-        [0.08, 0.7],
-        [0.8, 0.66],
-        [0.02, 0.45],
-        [0.82, 0.43]
-      ];
-      const next = cloudLabels.map((label, index) => {
-        const w = index % 2 ? 196 : 220;
-        const h = 92;
-        const [ax, ay] = anchors[index] ?? [0.5, 0.5];
-        return {
-          id: index,
-          label,
-          x: Math.max(18, Math.min(rect.width - w - 18, ax * (rect.width - w))),
-          y: Math.max(92, Math.min(rect.height - h - 28, ay * (rect.height - h))),
-          vx: (index % 2 ? 0.24 : -0.22) + index * 0.01,
-          vy: index % 3 ? -0.18 : 0.2,
-          w,
-          h,
-          dragging: false,
-          hovered: false,
-          lastX: 0,
-          lastY: 0,
-          phase: index * 1.7
-        };
-      });
-      blobsRef.current = next;
-      setBlobs(next);
-    };
-
-    const tick = () => {
-      const rect = container.getBoundingClientRect();
-      const items = blobsRef.current;
-      const time = performance.now() / 1000;
-      for (const item of items) {
-        if (!item.dragging) {
-          item.vx += Math.sin(time * 0.45 + item.phase) * 0.0018;
-          item.vy += Math.cos(time * 0.38 + item.phase) * 0.0018;
-          item.x += item.vx;
-          item.y += item.vy;
-          item.vx *= 0.999;
-          item.vy *= 0.999;
-          if (Math.abs(item.vx) < 0.12) item.vx += item.id % 2 ? 0.008 : -0.008;
-          if (Math.abs(item.vy) < 0.1) item.vy += item.id % 3 ? -0.007 : 0.007;
-          item.vx = Math.max(-0.4, Math.min(0.4, item.vx));
-          item.vy = Math.max(-0.34, Math.min(0.34, item.vy));
-        }
-
-        if (item.x < 16 || item.x + item.w > rect.width - 16) {
-          item.vx *= -0.96;
-          item.x = Math.max(16, Math.min(rect.width - item.w - 16, item.x));
-        }
-        if (item.y < 84 || item.y + item.h > rect.height - 28) {
-          item.vy *= -0.96;
-          item.y = Math.max(84, Math.min(rect.height - item.h - 28, item.y));
-        }
-      }
-
-      for (let i = 0; i < items.length; i += 1) {
-        for (let j = i + 1; j < items.length; j += 1) {
-          const a = items[i];
-          const b = items[j];
-          const dx = a.x + a.w / 2 - (b.x + b.w / 2);
-          const dy = a.y + a.h / 2 - (b.y + b.h / 2);
-          const distance = Math.max(1, Math.hypot(dx, dy));
-          const minDistance = (a.w + b.w) * 0.36;
-          if (distance < minDistance) {
-            const push = (minDistance - distance) / minDistance;
-            const nx = dx / distance;
-            const ny = dy / distance;
-            a.vx += nx * push * 0.08;
-            a.vy += ny * push * 0.08;
-            b.vx -= nx * push * 0.08;
-            b.vy -= ny * push * 0.08;
-          }
-        }
-      }
-
-      setBlobs(items.map((item) => ({ ...item })));
-      rafId = requestAnimationFrame(tick);
-    };
-
-    seed();
-    rafId = requestAnimationFrame(tick);
-    window.addEventListener("resize", seed);
-    return () => {
-      cancelAnimationFrame(rafId);
-      window.removeEventListener("resize", seed);
-    };
-  }, []);
-
-  function updateBlob(id: number, patch: Partial<CloudItem>) {
-    blobsRef.current = blobsRef.current.map((item) => (item.id === id ? { ...item, ...patch } : item));
-    setBlobs(blobsRef.current.map((item) => ({ ...item })));
-  }
-
-  return (
-    <div ref={containerRef} className="pointer-events-none absolute inset-0 z-10 hidden overflow-hidden lg:block">
-      {blobs.map((blob) => (
-        <div
-          key={blob.id}
-          onPointerEnter={() => updateBlob(blob.id, { hovered: true })}
-          onPointerLeave={() => updateBlob(blob.id, { hovered: false })}
-          onPointerDown={(event) => {
-            event.preventDefault();
-            event.currentTarget.setPointerCapture(event.pointerId);
-            updateBlob(blob.id, { dragging: true, lastX: event.clientX, lastY: event.clientY, hovered: true });
-          }}
-          onPointerMove={(event) => {
-            const current = blobsRef.current.find((item) => item.id === blob.id);
-            if (!current?.dragging) return;
-            const dx = event.clientX - current.lastX;
-            const dy = event.clientY - current.lastY;
-            updateBlob(blob.id, {
-              x: current.x + dx,
-              y: current.y + dy,
-              vx: Math.max(-0.8, Math.min(0.8, dx * 0.08)),
-              vy: Math.max(-0.8, Math.min(0.8, dy * 0.08)),
-              lastX: event.clientX,
-              lastY: event.clientY
-            });
-          }}
-          onPointerUp={(event) => {
-            event.currentTarget.releasePointerCapture(event.pointerId);
-            const current = blobsRef.current.find((item) => item.id === blob.id) ?? blob;
-            updateBlob(blob.id, {
-              dragging: false,
-              vx: Math.max(-0.5, Math.min(0.5, current.vx || (blob.id % 2 ? 0.22 : -0.22))),
-              vy: Math.max(-0.42, Math.min(0.42, current.vy || (blob.id % 3 ? -0.18 : 0.18)))
-            });
-          }}
-          onPointerCancel={() => {
-            updateBlob(blob.id, {
-              dragging: false,
-              vx: blob.id % 2 ? 0.22 : -0.22,
-              vy: blob.id % 3 ? -0.18 : 0.18
-            });
-          }}
-          onLostPointerCapture={() => {
-            const current = blobsRef.current.find((item) => item.id === blob.id) ?? blob;
-            if (!current.dragging) return;
-            updateBlob(blob.id, {
-              dragging: false,
-              vx: Math.abs(current.vx) < 0.1 ? (blob.id % 2 ? 0.22 : -0.22) : current.vx,
-              vy: Math.abs(current.vy) < 0.08 ? (blob.id % 3 ? -0.18 : 0.18) : current.vy
-            });
-          }}
-          className="cloud-blob pointer-events-auto absolute grid cursor-grab select-none place-items-center px-8 text-center text-sm font-black uppercase text-graphite transition-transform active:cursor-grabbing"
-          style={{
-            width: blob.w,
-            height: blob.h,
-            transform: `translate3d(${blob.x}px, ${blob.y}px, 0) scale(${blob.hovered ? 1.04 : 1})`,
-            userSelect: "none",
-            WebkitUserSelect: "none"
-          }}
-        >
-          <span className="pointer-events-none relative z-10 select-none">{blob.label}</span>
-        </div>
-      ))}
-    </div>
   );
 }
 
@@ -664,28 +561,166 @@ function HorizontalGallery({
   );
 }
 
+function WorksShowcase() {
+  const [activeFilter, setActiveFilter] = useState<(typeof galleryFilters)[number]>("Все");
+  const [isOpen, setIsOpen] = useState(false);
+  const visibleItems = galleryItems.filter((item) => activeFilter === "Все" || item.category === activeFilter);
+  const previewItems = visibleItems.slice(0, 8);
+
+  return (
+    <section className="mx-auto max-w-7xl px-4 py-[clamp(3rem,10vw,4.5rem)] sm:px-6 lg:px-8">
+      <div className="flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
+        <div>
+          <p className="font-black uppercase text-pinkBrand">Примеры работ</p>
+          <h2 className="mt-2 font-display text-4xl font-black uppercase sm:text-6xl">Посмотрите, что уже печатали</h2>
+          <p className="mt-4 max-w-2xl text-lg font-bold leading-relaxed text-graphite/62">
+            Раскраски, открытки, визитки, фото и другие заказы — в одном компактном блоке.
+          </p>
+        </div>
+        <button
+          type="button"
+          onClick={() => setIsOpen(true)}
+          className="inline-flex min-h-11 w-fit items-center rounded-full bg-pinkBrand px-5 py-3 text-sm font-black uppercase text-white shadow-sticker"
+        >
+          Смотреть больше
+        </button>
+      </div>
+
+      <div className="mobile-snap mt-6 flex gap-2 overflow-x-auto pb-1 text-xs font-black uppercase text-graphite/60">
+        {galleryFilters.map((filter) => (
+          <button
+            key={filter}
+            type="button"
+            onClick={() => setActiveFilter(filter)}
+            className={`shrink-0 rounded-full px-4 py-2 transition ${
+              activeFilter === filter ? "bg-pinkBrand text-white shadow-sticker" : "bg-white text-graphite shadow-paper"
+            }`}
+          >
+            {filter}
+          </button>
+        ))}
+      </div>
+
+      <div className="mt-6 grid grid-cols-2 gap-3 sm:grid-cols-4 lg:gap-4">
+        {previewItems.map((item, index) => (
+          <button
+            key={`${item.src}-${index}`}
+            type="button"
+            onClick={() => setIsOpen(true)}
+            className={`group relative overflow-hidden rounded-[1.25rem] bg-white shadow-paper ${index === 0 ? "sm:col-span-2 sm:row-span-2" : ""}`}
+          >
+            <span className="relative block aspect-square">
+              <Image src={item.src} alt={item.alt} fill loading="lazy" className="object-cover transition duration-500 group-hover:scale-105" sizes="(min-width: 1024px) 18rem, 45vw" />
+            </span>
+            <span className="absolute inset-x-2 bottom-2 rounded-full bg-white/92 px-3 py-2 text-left text-[11px] font-black uppercase text-graphite shadow-paper">
+              {item.category}
+            </span>
+          </button>
+        ))}
+      </div>
+
+      <AnimatePresence>
+        {isOpen && (
+          <motion.div
+            className="fixed inset-0 z-[120] overflow-y-auto bg-graphite/78 px-4 py-6 backdrop-blur-sm sm:px-6"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+          >
+            <motion.div
+              className="mx-auto max-w-6xl rounded-[1.8rem] bg-white p-4 text-graphite shadow-paper sm:p-6 lg:rounded-[2.5rem]"
+              initial={{ y: 24, scale: 0.98 }}
+              animate={{ y: 0, scale: 1 }}
+              exit={{ y: 24, scale: 0.98 }}
+            >
+              <div className="flex items-start justify-between gap-4">
+                <div>
+                  <p className="font-black uppercase text-pinkBrand">Галерея</p>
+                  <h3 className="mt-1 font-display text-3xl font-black uppercase sm:text-5xl">Больше примеров</h3>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => setIsOpen(false)}
+                  className="grid h-11 w-11 shrink-0 place-items-center rounded-full bg-graphite text-white"
+                  aria-label="Закрыть галерею"
+                >
+                  <X size={20} />
+                </button>
+              </div>
+              <div className="mt-5 grid grid-cols-2 gap-3 md:grid-cols-3 lg:grid-cols-4">
+                {visibleItems.map((item) => (
+                  <figure key={item.src} className="overflow-hidden rounded-[1.2rem] bg-milk">
+                    <div className="relative aspect-square">
+                      <Image src={item.src} alt={item.alt} fill loading="lazy" className="object-cover" sizes="(min-width: 1024px) 16rem, 45vw" />
+                    </div>
+                    <figcaption className="p-3 text-xs font-black uppercase text-graphite/65">{item.alt}</figcaption>
+                  </figure>
+                ))}
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </section>
+  );
+}
+
 function OrderBuilder({
   builder,
   price,
   updateBuilder,
   chooseProduct,
+  toggleExtra,
   passToForm
 }: {
   builder: BuilderState;
   price: number;
   updateBuilder: (next: Partial<BuilderState>) => void;
   chooseProduct: (product: keyof typeof serviceMap) => void;
+  toggleExtra: (option: ExtraOption) => void;
   passToForm: () => void;
 }) {
   const availableFormats = serviceFormatOptions[builder.service];
-  const quantityLabel = builder.service === "Раскраска по фото" ? "Количество фото" : "Количество";
-  const quantityUnit = builder.service === "Раскраска по фото" ? "фото" : "шт.";
+  const usesStepper = !["Визитки", "Открытки", "Макеты"].includes(builder.service);
+  const quantityLabel =
+    builder.service === "Раскраска по фото"
+      ? "Количество фото"
+      : builder.service === "Документы"
+        ? "Количество страниц"
+        : "Количество";
+  const quantityUnit =
+    builder.service === "Раскраска по фото"
+      ? "фото"
+      : builder.service === "Документы"
+        ? "стр."
+        : "шт.";
   const helperText =
     builder.service === "Раскраска по фото"
       ? "В базу входят 5 фото. Сверх 5 фото добавляются к цене."
       : builder.service === "Фото на документы"
         ? "Для фото на документы доступны только 3×4 и 3,5×4,5."
+        : builder.service === "Визитки"
+          ? "Выберите размер, тираж, стороны и бумагу. Минимальная стоимость визиток — 900 ₽."
+          : builder.service === "Открытки"
+            ? "Можно заказать одну открытку или небольшой тираж, со своим макетом или подготовкой дизайна."
+            : builder.service === "Документы"
+              ? "Для документов считаем страницы: печать, копии, сканы или ламинацию."
+              : builder.service === "Макеты"
+                ? builder.layoutType === "макет с нуля" && builder.layoutPurpose === "другой макет"
+                  ? "Для нестандартного макета покажем цену от 2000 ₽ и уточним стоимость после просмотра задачи."
+                  : "Подготовим файл к печати или соберём макет под выбранную задачу."
         : "Подскажем, как лучше оформить заказ: бумагу, резку, ламинацию и упаковку подберём под задачу.";
+  const summaryDetails =
+    builder.service === "Визитки"
+      ? `${builder.format} / ${builder.quantity} шт. / ${builder.sides} / ${builder.paper === "плотная матовая" ? "плотная бумага" : "стандартная бумага"}`
+      : builder.service === "Открытки"
+        ? `${builder.format} / ${builder.quantity} шт. / ${builder.sides} / ${builder.paper === "плотная матовая" ? "плотная бумага" : "стандартная бумага"}`
+        : builder.service === "Документы"
+          ? `${builder.documentJob} / ${builder.printColor} / ${builder.quantity} ${quantityUnit}`
+          : builder.service === "Макеты"
+            ? `${builder.layoutType} / ${builder.layoutPurpose}`
+            : `${builder.format} / ${builder.quantity} ${quantityUnit}`;
+  const pricePrefix = builder.service === "Макеты" && builder.layoutType === "макет с нуля" && builder.layoutPurpose === "другой макет" ? "от " : "";
 
   return (
     <section id="ver2-builder" className="mx-auto grid max-w-7xl gap-5 px-4 py-12 sm:px-6 sm:py-16 lg:grid-cols-[1.05fr_0.95fr] lg:px-8 lg:py-20">
@@ -704,30 +739,159 @@ function OrderBuilder({
             </Chip>
           ))}
         </BuilderGroup>
-        <BuilderGroup title="Формат">
-          {availableFormats.map((item) => (
-            <Chip key={item} active={builder.format === item} onClick={() => updateBuilder({ format: item })}>
-              {item}
-            </Chip>
-          ))}
-        </BuilderGroup>
-        <div className="my-5 rounded-[1.5rem] bg-white p-4 shadow-paper sm:my-8 sm:rounded-[2rem] sm:p-5">
-          <p className="text-sm font-black uppercase text-graphite/55">{quantityLabel}</p>
-          <div className="mt-3 flex items-center gap-4">
-            <button type="button" className="grid h-12 w-12 shrink-0 place-items-center rounded-full bg-graphite text-white sm:h-14 sm:w-14" onClick={() => updateBuilder({ quantity: Math.max(1, builder.quantity - 1) })}>
-              <Minus />
-            </button>
-            <motion.div key={builder.quantity} initial={{ scale: 0.8 }} animate={{ scale: 1 }} className="font-display text-5xl font-black text-pinkBrand sm:text-6xl">
-              {builder.quantity}
-            </motion.div>
-            <span className="text-sm font-black uppercase text-graphite/45">{quantityUnit}</span>
-            <button type="button" className="ml-auto grid h-12 w-12 shrink-0 place-items-center rounded-full bg-pinkBrand text-white sm:h-14 sm:w-14" onClick={() => updateBuilder({ quantity: builder.quantity + 1 })}>
-              <Plus />
-            </button>
+        {builder.service !== "Макеты" && (
+          <BuilderGroup title={builder.service === "Визитки" ? "Размер" : "Формат"}>
+            {availableFormats.map((item) => (
+              <Chip key={item} active={builder.format === item} onClick={() => updateBuilder({ format: item })}>
+                {item}
+              </Chip>
+            ))}
+          </BuilderGroup>
+        )}
+
+        {builder.service === "Визитки" && (
+          <>
+            <BuilderGroup title="Тираж">
+              {businessCardQuantities.map((item) => (
+                <Chip key={item} active={builder.quantity === item} onClick={() => updateBuilder({ quantity: item })}>
+                  {item} шт.
+                </Chip>
+              ))}
+            </BuilderGroup>
+            <BuilderGroup title="Стороны">
+              {(["односторонние", "двусторонние"] as BusinessCardSides[]).map((item) => (
+                <Chip key={item} active={builder.sides === item} onClick={() => updateBuilder({ sides: item })}>
+                  {item}
+                </Chip>
+              ))}
+            </BuilderGroup>
+            <BuilderGroup title="Бумага">
+              {(["обычная", "плотная матовая"] as PaperType[]).map((item) => (
+                <Chip key={item} active={builder.paper === item} onClick={() => updateBuilder({ paper: item })}>
+                  {item === "обычная" ? "стандартная" : "плотная"}
+                </Chip>
+              ))}
+            </BuilderGroup>
+            <BuilderGroup title="Опции">
+              {(["скругление углов", "срочность"] as ExtraOption[]).map((item) => (
+                <Chip key={item} active={builder.extras.includes(item)} onClick={() => toggleExtra(item)}>
+                  {item}
+                </Chip>
+              ))}
+            </BuilderGroup>
+          </>
+        )}
+
+        {builder.service === "Открытки" && (
+          <>
+            <BuilderGroup title="Количество">
+              {postcardQuantities.map((item) => (
+                <Chip key={item} active={builder.quantity === item} onClick={() => updateBuilder({ quantity: item })}>
+                  {item} шт.
+                </Chip>
+              ))}
+            </BuilderGroup>
+            <BuilderGroup title="Тип">
+              {(["односторонние", "двусторонние"] as BusinessCardSides[]).map((item) => (
+                <Chip key={item} active={builder.sides === item} onClick={() => updateBuilder({ sides: item })}>
+                  {item}
+                </Chip>
+              ))}
+            </BuilderGroup>
+            <BuilderGroup title="Бумага">
+              {(["обычная", "плотная матовая"] as PaperType[]).map((item) => (
+                <Chip key={item} active={builder.paper === item} onClick={() => updateBuilder({ paper: item })}>
+                  {item === "обычная" ? "стандартная" : "плотная"}
+                </Chip>
+              ))}
+            </BuilderGroup>
+            <BuilderGroup title="Макет и конверт">
+              {(["свой макет", "нужна подготовка макета"] as PostcardDesign[]).map((item) => (
+                <Chip key={item} active={builder.postcardDesign === item} onClick={() => updateBuilder({ postcardDesign: item })}>
+                  {item}
+                </Chip>
+              ))}
+              <Chip active={builder.hasEnvelope} onClick={() => updateBuilder({ hasEnvelope: !builder.hasEnvelope })}>
+                конверт
+              </Chip>
+            </BuilderGroup>
+          </>
+        )}
+
+        {builder.service === "Документы" && (
+          <>
+            <BuilderGroup title="Тип">
+              {documentJobs.map((item) => (
+                <Chip key={item} active={builder.documentJob === item} onClick={() => updateBuilder({ documentJob: item })}>
+                  {item}
+                </Chip>
+              ))}
+            </BuilderGroup>
+            {builder.documentJob !== "скан" && builder.documentJob !== "ламинация" && (
+              <BuilderGroup title="Печать">
+                {(["ч/б", "цветная"] as PrintColor[]).map((item) => (
+                  <Chip key={item} active={builder.printColor === item} onClick={() => updateBuilder({ printColor: item })}>
+                    {item}
+                  </Chip>
+                ))}
+              </BuilderGroup>
+            )}
+          </>
+        )}
+
+        {builder.service === "Макеты" && (
+          <>
+            <BuilderGroup title="Тип работы">
+              {layoutTypes.map((item) => (
+                <Chip key={item} active={builder.layoutType === item} onClick={() => updateBuilder({ layoutType: item })}>
+                  {item}
+                </Chip>
+              ))}
+            </BuilderGroup>
+            {builder.layoutType === "макет с нуля" && (
+              <BuilderGroup title="Назначение">
+                {layoutPurposes.map((item) => (
+                  <Chip key={item} active={builder.layoutPurpose === item} onClick={() => updateBuilder({ layoutPurpose: item })}>
+                    {item}
+                  </Chip>
+                ))}
+              </BuilderGroup>
+            )}
+            <BuilderGroup title="Срок">
+              <Chip active={builder.extras.includes("срочность")} onClick={() => toggleExtra("срочность")}>
+                срочно
+              </Chip>
+            </BuilderGroup>
+          </>
+        )}
+
+        {usesStepper && (
+          <div className="my-5 rounded-[1.5rem] bg-white p-4 shadow-paper sm:my-8 sm:rounded-[2rem] sm:p-5">
+            <p className="text-sm font-black uppercase text-graphite/55">{quantityLabel}</p>
+            <div className="mt-3 flex items-center gap-4">
+              <button type="button" className="grid h-12 w-12 shrink-0 place-items-center rounded-full bg-graphite text-white sm:h-14 sm:w-14" onClick={() => updateBuilder({ quantity: Math.max(1, builder.quantity - 1) })}>
+                <Minus />
+              </button>
+              <motion.div key={builder.quantity} initial={{ scale: 0.8 }} animate={{ scale: 1 }} className="font-display text-5xl font-black text-pinkBrand sm:text-6xl">
+                {builder.quantity}
+              </motion.div>
+              <span className="text-sm font-black uppercase text-graphite/45">{quantityUnit}</span>
+              <button type="button" className="ml-auto grid h-12 w-12 shrink-0 place-items-center rounded-full bg-pinkBrand text-white sm:h-14 sm:w-14" onClick={() => updateBuilder({ quantity: builder.quantity + 1 })}>
+                <Plus />
+              </button>
+            </div>
+            {builder.service === "Документы" && (
+              <button type="button" className={`mt-4 rounded-full px-4 py-2 text-xs font-black uppercase transition ${builder.extras.includes("срочность") ? "bg-pinkBrand text-white" : "bg-pinkSoft text-pinkBrand"}`} onClick={() => toggleExtra("срочность")}>
+                срочно
+              </button>
+            )}
           </div>
-        </div>
+        )}
         <div className="mt-5 rounded-[1.5rem] bg-white p-4 font-black text-graphite/60 shadow-paper sm:mt-8 sm:rounded-[2rem] sm:p-5">
           {helperText}
+          {builder.service === "Макеты" && builder.layoutType === "макет с нуля" && builder.layoutPurpose === "другой макет" && (
+            <p className="mt-3 text-pinkBrand">Точную стоимость уточним после просмотра задачи.</p>
+          )}
         </div>
       </div>
 
@@ -738,12 +902,12 @@ function OrderBuilder({
         <div className="mt-4 rounded-[1.5rem] bg-white p-4 text-graphite sm:mt-6 sm:min-h-48 sm:rounded-[2rem] sm:p-5">
           <p className="font-black uppercase text-pinkBrand">Чек печатается</p>
           <p className="mt-3 font-display text-3xl font-black uppercase">{builder.product}</p>
-          <p className="mt-2 font-bold text-graphite/60">{builder.format} / {builder.quantity} {quantityUnit}</p>
+          <p className="mt-2 font-bold text-graphite/60">{summaryDetails}</p>
           <p className="mt-4 hidden rounded-full bg-pinkSoft px-4 py-3 text-xs font-black uppercase text-pinkBrand sm:block">
-            Поможем выбрать оформление
+            Подскажем, как лучше оформить заказ
           </p>
           <motion.p key={price} initial={{ y: 20, opacity: 0 }} animate={{ y: 0, opacity: 1 }} className="mt-4 font-display text-5xl font-black text-pinkBrand sm:mt-6">
-            {formatRub(price)}
+            {pricePrefix}{formatRub(price)}
           </motion.p>
         </div>
         <button onClick={passToForm} className="magnetic mt-5 min-h-12 w-full rounded-full bg-pinkBrand px-7 py-4 font-black uppercase text-white shadow-sticker">
@@ -949,7 +1113,7 @@ function Contacts() {
   const items = [
     {
       label: "ВКонтакте",
-      value: "vk.com/nasha_pechat",
+      value: "Открыть сообщество",
       href: "https://vk.com/nasha_pechat",
       icon: ExternalLink,
       external: true
@@ -963,7 +1127,7 @@ function Contacts() {
     },
     {
       label: "Почта",
-      value: "korewkov.des@gmail.com",
+      value: "Написать на почту",
       href: "mailto:korewkov.des@gmail.com",
       icon: Mail,
       external: false
@@ -993,10 +1157,10 @@ function Contacts() {
                   className="group rounded-[1.35rem] border border-white/10 bg-white p-4 text-graphite shadow-paper transition hover:border-pinkBrand hover:bg-pinkSoft"
                 >
                   <span className="grid h-11 w-11 place-items-center rounded-full bg-pinkBrand text-white shadow-sticker">
-                    <Icon size={20} />
+                    {item.label === "ВКонтакте" ? <span className="text-sm font-black">VK</span> : <Icon size={20} />}
                   </span>
                   <span className="mt-4 block text-xs font-black uppercase text-graphite/50">{item.label}</span>
-                  <span className="mt-1 block break-words text-sm font-black text-graphite sm:text-base">{item.value}</span>
+                  <span className="mt-1 block whitespace-nowrap text-[clamp(0.82rem,2.6vw,1rem)] font-black text-graphite">{item.value}</span>
                 </a>
               );
             })}
@@ -1020,7 +1184,20 @@ function QuickOrder({
   const [message, setMessage] = useState("");
   const quantityUnit = builder.service === "Раскраска по фото" ? "фото" : "шт.";
   const summary = useMemo(
-    () => `${builder.product}, ${builder.format}, ${builder.quantity} ${quantityUnit}, ${builder.extras.length ? builder.extras.join(", ") : "без доп. опций"}`,
+    () => {
+      const details =
+        builder.service === "Визитки"
+          ? `${builder.format}, ${builder.quantity} шт., ${builder.sides}, ${builder.paper === "плотная матовая" ? "плотная бумага" : "стандартная бумага"}`
+          : builder.service === "Открытки"
+            ? `${builder.format}, ${builder.quantity} шт., ${builder.sides}, ${builder.paper === "плотная матовая" ? "плотная бумага" : "стандартная бумага"}, ${builder.postcardDesign}${builder.hasEnvelope ? ", конверт" : ""}`
+            : builder.service === "Документы"
+              ? `${builder.documentJob}, ${builder.printColor}, ${builder.quantity} стр.`
+              : builder.service === "Макеты"
+                ? `${builder.layoutType}, ${builder.layoutPurpose}`
+                : `${builder.format}, ${builder.quantity} ${quantityUnit}`;
+
+      return `${builder.product}, ${details}, ${builder.extras.length ? builder.extras.join(", ") : "без доп. опций"}`;
+    },
     [builder, quantityUnit]
   );
 
