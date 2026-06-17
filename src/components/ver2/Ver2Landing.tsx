@@ -43,43 +43,37 @@ const serviceMap: Record<string, ServiceType> = {
 };
 
 const faqItems = [
-  ["Можно одну штуку?", "Да. Печатаем маленькие заказы без неловкости."],
+  ["Можно заказать одну штуку?", "Да, можно. Мы берём и маленькие заказы: открытку, одно фото, один макет или небольшой тираж."],
   ["Можно без макета?", "Да. Напишите идею, подскажем формат и подготовку."],
-  ["Сколько стоит?", "Калькулятор даст ориентир. Точно скажем после проверки."],
+  ["Сколько стоит?", "Цена зависит от формата, количества и типа заказа. Базовые цены указаны в карточках услуг и калькуляторе. Точную стоимость покажем перед оформлением заявки."],
   ["Как передать фото?", "Фото можно передать через Telegram, MAX, ВКонтакте или отправить на электронную почту. После заявки подскажем самый удобный способ и поможем с файлами."],
-  ["Можно срочно?", "Если есть окно в графике, сделаем быстрее."]
+  ["Можно срочно?", "Да, если есть свободное окно в графике. Напишите нам — сразу сориентируем по срокам."]
 ] as const;
 
-const reelVideos = [
+const stageVideos = [
   {
-    title: "Рождение раскраски",
-    caption: "Фото, линии, разворот",
+    title: "Подготовка",
+    caption: "Проверяем файлы, фото и пожелания.",
     src: "/reels/optimized/process-1.mp4",
     poster: "/works/optimized/coloring-1.jpg"
   },
   {
     title: "Печать и сборка",
-    caption: "Листы выходят красиво",
+    caption: "Печатаем аккуратно и собираем заказ.",
     src: "/reels/optimized/process-2.mp4",
     poster: "/works/optimized/printing-1.jpg"
   },
   {
-    title: "Фото на документы",
-    caption: "Ровный размер и чистая печать",
+    title: "Проверка",
+    caption: "Смотрим качество, размеры и детали.",
     src: "/reels/optimized/process-3.mp4",
     poster: "/works/optimized/photo-1.jpg"
   },
   {
-    title: "Упаковка заказа",
-    caption: "Важное внутри",
+    title: "Упаковка",
+    caption: "Передаём заказ в аккуратном виде.",
     src: "/reels/optimized/process-4.mp4",
     poster: "/works/optimized/packaging-1.jpg"
-  },
-  {
-    title: "Готовая красота",
-    caption: "Проверяем детали",
-    src: "/reels/optimized/process-5.mp4",
-    poster: "/works/optimized/card-1.jpg"
   }
 ] as const;
 
@@ -106,37 +100,32 @@ const cloudLabels = ["Раскраска", "Фото", "Визитки", "Отк
 const tapeCards = [
   {
     title: "Раскраска по фото",
-    description: "Персональная раскраска по фотографиям ребёнка, семьи или любимого момента.",
+    description: "Превратим ваши фотографии в персональную раскраску для ребёнка или взрослого.",
     price: "от 1000 ₽",
-    category: "Раскраски",
     image: "/images/tape/tape-coloring.jpeg"
   },
   {
     title: "Фото на документы",
-    description: "Фото 3x4 и 3,5x4,5 для документов.",
+    description: "Фото 3×4, 3,5×4,5 и другие форматы для документов.",
     price: "от 300 ₽",
-    category: "Фото",
     image: "/images/tape/tape-doc-photo.jpeg"
   },
   {
     title: "Визитки",
     description: "Аккуратные визитки для себя, мастера или малого бизнеса.",
     price: "от 500 ₽",
-    category: "Визитки",
     image: "/images/tape/tape-business-cards.jpeg"
   },
   {
     title: "Открытки",
-    description: "Открытки для подарков, праздников и тёплых слов.",
+    description: "Открытки для подарков, поздравлений и тёплых слов.",
     price: "от 200 ₽",
-    category: "Открытки",
     image: "/images/tape/tape-postcards.jpeg"
   },
   {
     title: "Документы",
     description: "Печать документов, анкет, файлов и учебных материалов.",
     price: "от 100 ₽",
-    category: "Документы",
     image: "/images/tape/tape-documents.jpeg"
   }
 ] as const;
@@ -286,17 +275,17 @@ function ProcessReels() {
     <section className="mx-auto max-w-7xl px-4 py-[clamp(3.5rem,12vw,5rem)] sm:px-6 lg:px-8 lg:py-20">
       <div className="mb-10 flex flex-col gap-3 md:flex-row md:items-end md:justify-between">
         <div>
-          <p className="font-black uppercase text-pinkBrand">Процесс</p>
+          <p className="font-black uppercase text-pinkBrand">Этапы</p>
           <h2 className="font-display text-4xl font-black uppercase sm:text-6xl">
             Как это рождается
           </h2>
         </div>
         <p className="max-w-sm text-lg font-black text-graphite/60">
-          Маленькая магия: из файла на экране рождается вещь, которую хочется держать в руках.
+          Из ваших фото, файлов и идей мы собираем аккуратный печатный заказ — от подготовки макета до упаковки.
         </p>
       </div>
-      <div className="mobile-snap flex gap-4 overflow-x-auto pb-5 sm:gap-5">
-        {reelVideos.map((video, index) => (
+      <div className="mobile-snap flex max-w-full gap-4 overflow-x-auto pb-5 sm:gap-5">
+        {stageVideos.map((video, index) => (
           <motion.article
             key={video.src}
             whileHover={{ y: -10, rotate: index % 2 ? 2 : -2 }}
@@ -315,7 +304,7 @@ function ProcessReels() {
             className="group relative aspect-[9/16] h-[min(68vh,520px)] min-h-[390px] w-[min(78vw,315px)] shrink-0 snap-center overflow-hidden rounded-[1.6rem] bg-graphite shadow-paper sm:w-[315px] lg:rounded-[2rem]"
           >
             <video
-              className="process-reel-video"
+              className="process-stage-video"
               src={video.src}
               poster={video.poster}
               muted
@@ -326,7 +315,7 @@ function ProcessReels() {
             <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-graphite/85 via-graphite/8 to-transparent" />
             <div className="absolute left-4 right-4 top-4 flex items-center justify-between">
               <span className="rounded-full bg-white/90 px-3 py-2 text-xs font-black uppercase text-pinkBrand">
-                reel {index + 1}
+                этап {index + 1}
               </span>
               <span className={`grid h-11 w-11 place-items-center rounded-full text-white shadow-sticker transition ${activeReel === index ? "bg-graphite" : "bg-pinkBrand"}`}>
                 <Play size={18} fill="currentColor" />
@@ -358,7 +347,7 @@ function HeroScene() {
       <div className="absolute inset-x-0 bottom-0 -z-10 h-48 bg-gradient-to-t from-milk to-transparent" />
       <CloudPlayground />
       <div className="pointer-events-none absolute left-[7%] top-28 z-10 h-16 w-24 rotate-[-10deg] rounded-2xl bg-white shadow-paper md:hidden" />
-      <div className="pointer-events-none absolute right-[-12px] top-48 z-10 h-24 w-20 rotate-[12deg] rounded-[1.5rem] bg-pinkSoft shadow-paper md:hidden" />
+      <div className="pointer-events-none absolute right-3 top-48 z-10 h-24 w-20 rotate-[12deg] rounded-[1.5rem] bg-pinkSoft shadow-paper md:hidden" />
       <nav className="fixed inset-x-4 top-4 z-[100] mx-auto flex max-w-7xl items-center justify-between rounded-full bg-white px-3 py-3 shadow-paper sm:px-5 sm:py-4">
         <a href="/" className="relative h-11 w-[min(54vw,16rem)] overflow-hidden sm:h-14 sm:w-64" aria-label="Наша печать">
           <Image src="/brand/logos/logo-wide-alt.svg" alt="Наша печать" fill className="object-contain object-left" priority />
@@ -376,7 +365,7 @@ function HeroScene() {
       <div className="relative z-20 mx-auto flex min-h-[calc(92svh-6rem)] max-w-7xl items-center justify-center py-[clamp(3.5rem,14vw,5rem)] text-center lg:min-h-[calc(100vh-7.5rem)] lg:py-20">
         <div className="select-none">
           <div className="space-y-2 overflow-hidden font-display text-[clamp(2.35rem,12.5vw,7.4rem)] font-black uppercase leading-[0.9] tracking-normal sm:text-[clamp(3rem,7.6vw,7.4rem)]">
-            {["Печатаем смело.", "Делаем красиво."].map((line, index) => (
+            {["Печатаем красиво.", "Делаем с душой."].map((line, index) => (
               <motion.h1
                 key={line}
                 initial={{ y: "110%", rotate: 2 }}
@@ -394,11 +383,11 @@ function HeroScene() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.45 }}
           >
-            Раскраски по фото, фото на документы, визитки, открытки и печать документов.
+            Раскраски по фото, фото на документы, визитки, открытки и макеты — аккуратно, быстро и с вниманием к деталям.
           </motion.p>
           <motion.div className="pointer-events-auto mt-9 flex flex-col justify-center gap-3 sm:flex-row" initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.65 }}>
             <a href="#ver2-builder" className="magnetic inline-flex min-h-12 items-center justify-center rounded-full bg-pinkBrand px-7 py-4 text-center font-black uppercase text-white shadow-sticker">
-              Собрать заказ
+              Рассчитать стоимость
             </a>
             <a href="#ver2-products" className="magnetic inline-flex min-h-12 items-center justify-center rounded-full border-2 border-graphite bg-white px-7 py-4 text-center font-black uppercase text-graphite">
               Смотреть услуги
@@ -423,12 +412,12 @@ function CloudPlayground() {
     const seed = () => {
       const rect = container.getBoundingClientRect();
       const anchors = [
-        [0.06, 0.2],
-        [0.72, 0.18],
-        [0.15, 0.68],
-        [0.78, 0.62],
-        [0.42, 0.24],
-        [0.52, 0.73]
+        [0.04, 0.22],
+        [0.78, 0.2],
+        [0.08, 0.7],
+        [0.8, 0.66],
+        [0.02, 0.45],
+        [0.82, 0.43]
       ];
       const next = cloudLabels.map((label, index) => {
         const w = index % 2 ? 196 : 220;
@@ -439,8 +428,8 @@ function CloudPlayground() {
           label,
           x: Math.max(18, Math.min(rect.width - w - 18, ax * (rect.width - w))),
           y: Math.max(92, Math.min(rect.height - h - 28, ay * (rect.height - h))),
-          vx: (index % 2 ? 0.9 : -0.82) + index * 0.035,
-          vy: (index % 3 ? -0.62 : 0.7),
+          vx: (index % 2 ? 0.24 : -0.22) + index * 0.01,
+          vy: index % 3 ? -0.18 : 0.2,
           w,
           h,
           dragging: false,
@@ -460,16 +449,16 @@ function CloudPlayground() {
       const time = performance.now() / 1000;
       for (const item of items) {
         if (!item.dragging) {
-          item.vx += Math.sin(time * 0.9 + item.phase) * 0.006;
-          item.vy += Math.cos(time * 0.75 + item.phase) * 0.006;
+          item.vx += Math.sin(time * 0.45 + item.phase) * 0.0018;
+          item.vy += Math.cos(time * 0.38 + item.phase) * 0.0018;
           item.x += item.vx;
           item.y += item.vy;
           item.vx *= 0.999;
           item.vy *= 0.999;
-          if (Math.abs(item.vx) < 0.42) item.vx += item.id % 2 ? 0.03 : -0.03;
-          if (Math.abs(item.vy) < 0.34) item.vy += item.id % 3 ? -0.026 : 0.026;
-          item.vx = Math.max(-1.55, Math.min(1.55, item.vx));
-          item.vy = Math.max(-1.25, Math.min(1.25, item.vy));
+          if (Math.abs(item.vx) < 0.12) item.vx += item.id % 2 ? 0.008 : -0.008;
+          if (Math.abs(item.vy) < 0.1) item.vy += item.id % 3 ? -0.007 : 0.007;
+          item.vx = Math.max(-0.4, Math.min(0.4, item.vx));
+          item.vy = Math.max(-0.34, Math.min(0.34, item.vy));
         }
 
         if (item.x < 16 || item.x + item.w > rect.width - 16) {
@@ -494,10 +483,10 @@ function CloudPlayground() {
             const push = (minDistance - distance) / minDistance;
             const nx = dx / distance;
             const ny = dy / distance;
-            a.vx += nx * push * 0.34;
-            a.vy += ny * push * 0.34;
-            b.vx -= nx * push * 0.34;
-            b.vy -= ny * push * 0.34;
+            a.vx += nx * push * 0.08;
+            a.vy += ny * push * 0.08;
+            b.vx -= nx * push * 0.08;
+            b.vy -= ny * push * 0.08;
           }
         }
       }
@@ -521,7 +510,7 @@ function CloudPlayground() {
   }
 
   return (
-    <div ref={containerRef} className="pointer-events-none absolute inset-0 z-40 hidden overflow-hidden lg:block">
+    <div ref={containerRef} className="pointer-events-none absolute inset-0 z-10 hidden overflow-hidden lg:block">
       {blobs.map((blob) => (
         <div
           key={blob.id}
@@ -540,8 +529,8 @@ function CloudPlayground() {
             updateBlob(blob.id, {
               x: current.x + dx,
               y: current.y + dy,
-              vx: Math.max(-3, Math.min(3, dx * 0.24)),
-              vy: Math.max(-3, Math.min(3, dy * 0.24)),
+              vx: Math.max(-0.8, Math.min(0.8, dx * 0.08)),
+              vy: Math.max(-0.8, Math.min(0.8, dy * 0.08)),
               lastX: event.clientX,
               lastY: event.clientY
             });
@@ -551,15 +540,15 @@ function CloudPlayground() {
             const current = blobsRef.current.find((item) => item.id === blob.id) ?? blob;
             updateBlob(blob.id, {
               dragging: false,
-              vx: Math.max(-1.8, Math.min(1.8, current.vx || (blob.id % 2 ? 0.9 : -0.9))),
-              vy: Math.max(-1.4, Math.min(1.4, current.vy || (blob.id % 3 ? -0.7 : 0.7)))
+              vx: Math.max(-0.5, Math.min(0.5, current.vx || (blob.id % 2 ? 0.22 : -0.22))),
+              vy: Math.max(-0.42, Math.min(0.42, current.vy || (blob.id % 3 ? -0.18 : 0.18)))
             });
           }}
           onPointerCancel={() => {
             updateBlob(blob.id, {
               dragging: false,
-              vx: blob.id % 2 ? 1 : -1,
-              vy: blob.id % 3 ? -0.72 : 0.72
+              vx: blob.id % 2 ? 0.22 : -0.22,
+              vy: blob.id % 3 ? -0.18 : 0.18
             });
           }}
           onLostPointerCapture={() => {
@@ -567,15 +556,15 @@ function CloudPlayground() {
             if (!current.dragging) return;
             updateBlob(blob.id, {
               dragging: false,
-              vx: Math.abs(current.vx) < 0.35 ? (blob.id % 2 ? 1 : -1) : current.vx,
-              vy: Math.abs(current.vy) < 0.28 ? (blob.id % 3 ? -0.72 : 0.72) : current.vy
+              vx: Math.abs(current.vx) < 0.1 ? (blob.id % 2 ? 0.22 : -0.22) : current.vx,
+              vy: Math.abs(current.vy) < 0.08 ? (blob.id % 3 ? -0.18 : 0.18) : current.vy
             });
           }}
           className="cloud-blob pointer-events-auto absolute grid cursor-grab select-none place-items-center px-8 text-center text-sm font-black uppercase text-graphite transition-transform active:cursor-grabbing"
           style={{
             width: blob.w,
             height: blob.h,
-            transform: `translate3d(${blob.x}px, ${blob.y}px, 0) scale(${blob.hovered ? 1.08 : 1})`,
+            transform: `translate3d(${blob.x}px, ${blob.y}px, 0) scale(${blob.hovered ? 1.04 : 1})`,
             userSelect: "none",
             WebkitUserSelect: "none"
           }}
@@ -643,9 +632,9 @@ function HorizontalGallery({
     <section id="ver2-products" ref={galleryRef} className="relative overflow-hidden bg-graphite py-16 text-white lg:min-h-screen">
       <div className="px-4 sm:px-6 lg:px-8">
         <p className="font-black uppercase text-pinkSoft">Услуги и цены</p>
-        <h2 className="mt-2 font-display text-4xl font-black uppercase sm:text-6xl">Едут по печатной ленте</h2>
+        <h2 className="mt-2 font-display text-4xl font-black uppercase sm:text-6xl">Что можно заказать</h2>
         <p className="mt-4 max-w-xl text-lg font-black text-white/62">
-          Листайте поток печатных вещей: видно, что заказать, как это выглядит и от какой цены стартует.
+          Листайте карточки услуг: видно, что заказать, как это выглядит и от какой цены стартует.
         </p>
       </div>
       <div ref={trackRef} className="mobile-snap mt-10 flex w-auto max-w-none items-end gap-4 overflow-x-auto px-4 pb-5 sm:px-6 lg:mt-12 lg:w-max lg:gap-5 lg:overflow-visible lg:px-8 lg:pb-0">
@@ -656,8 +645,7 @@ function HorizontalGallery({
             </div>
             <div className="flex min-h-0 flex-1 flex-col justify-between px-1 pb-1 pt-4">
               <div>
-                <p className="text-[11px] font-black uppercase text-pinkBrand">{work.category}</p>
-                <h3 className="mt-1 font-display text-2xl font-black uppercase leading-none">{work.title}</h3>
+                <h3 className="font-display text-2xl font-black uppercase leading-none">{work.title}</h3>
                 <p className="mt-2 line-clamp-2 text-sm font-bold leading-snug text-graphite/62">{work.description}</p>
               </div>
               <div className="mt-3 flex flex-wrap items-center gap-2">
@@ -696,8 +684,8 @@ function OrderBuilder({
     builder.service === "Раскраска по фото"
       ? "В базу входят 5 фото. Сверх 5 фото добавляются к цене."
       : builder.service === "Фото на документы"
-        ? "Для фото на документы доступны только 3x4 и 3,5x4,5."
-        : "Бумагу, резку, ламинацию и упаковку подберем под результат.";
+        ? "Для фото на документы доступны только 3×4 и 3,5×4,5."
+        : "Подскажем, как лучше оформить заказ: бумагу, резку, ламинацию и упаковку подберём под задачу.";
 
   return (
     <section id="ver2-builder" className="mx-auto grid max-w-7xl gap-5 px-4 py-12 sm:px-6 sm:py-16 lg:grid-cols-[1.05fr_0.95fr] lg:px-8 lg:py-20">
@@ -752,14 +740,14 @@ function OrderBuilder({
           <p className="mt-3 font-display text-3xl font-black uppercase">{builder.product}</p>
           <p className="mt-2 font-bold text-graphite/60">{builder.format} / {builder.quantity} {quantityUnit}</p>
           <p className="mt-4 hidden rounded-full bg-pinkSoft px-4 py-3 text-xs font-black uppercase text-pinkBrand sm:block">
-            Остальное подберем под вау-эффект
+            Поможем выбрать оформление
           </p>
           <motion.p key={price} initial={{ y: 20, opacity: 0 }} animate={{ y: 0, opacity: 1 }} className="mt-4 font-display text-5xl font-black text-pinkBrand sm:mt-6">
             {formatRub(price)}
           </motion.p>
         </div>
         <button onClick={passToForm} className="magnetic mt-5 min-h-12 w-full rounded-full bg-pinkBrand px-7 py-4 font-black uppercase text-white shadow-sticker">
-          Передать в заявку
+          Оставить заявку
         </button>
       </aside>
     </section>
@@ -791,9 +779,9 @@ function GiftMiniGame() {
   return (
     <section className="mx-auto max-w-7xl px-4 py-[clamp(3.5rem,12vw,5rem)] sm:px-6 lg:px-8 lg:py-20">
       <div className="mb-8 max-w-3xl">
-        <h2 className="mt-2 font-display text-4xl font-black uppercase sm:text-6xl">Нажмите на вау</h2>
+        <h2 className="mt-2 font-display text-4xl font-black uppercase sm:text-6xl">Откройте подарок</h2>
         <p className="mt-5 text-lg font-bold text-graphite/62">
-          Добейте шкалу радости до конца — внутри спрятан подарок для первого заказа.
+          Заполните шкалу до конца — внутри промокод для первого заказа.
         </p>
       </div>
       <motion.div
@@ -880,7 +868,7 @@ function GiftMiniGame() {
                     onClick={() => setClicks((value) => Math.min(targetClicks, value + 1))}
                     className="min-h-24 rounded-full bg-white px-14 py-7 font-display text-5xl font-black uppercase text-pinkBrand shadow-paper sm:px-16 sm:py-8"
                   >
-                    Вау
+                    Подарок
                   </motion.button>
                   <p className="mt-7 font-display text-4xl font-black text-white">{progress}%</p>
                   <div className="mx-auto mt-4 grid max-w-xs grid-cols-10 gap-1">
@@ -903,16 +891,16 @@ function GiftMiniGame() {
 
 function EmotionReasons() {
   const items = [
-    ["Сначала улыбка", "Человек видит себя, свою семью или свой бренд в настоящей вещи."],
-    ["Потом вау", "Цвет, бумага, упаковка и детали собираются в аккуратный подарок."],
-    ["И хочется сохранить", "Это не просто распечатка, а маленький момент, который остается."]
+    ["Сначала идея", "Вы приносите фото, файл или задачу."],
+    ["Потом оформление", "Мы подбираем формат, бумагу и детали печати."],
+    ["И хочется сохранить", "Получается заказ, который приятно подарить, вручить или оставить себе."]
   ] as const;
 
   return (
     <section className="mx-auto max-w-7xl px-4 py-[clamp(3.5rem,12vw,5rem)] sm:px-6 lg:px-8 lg:py-20">
       <div className="rounded-[1.8rem] bg-graphite p-5 text-white shadow-paper sm:p-9 lg:rounded-[2.5rem]">
-        <p className="font-black uppercase text-pinkSoft">Не про печать. Про ощущение.</p>
-        <h2 className="mt-2 max-w-4xl font-display text-4xl font-black uppercase sm:text-6xl">Почему это работает эмоционально</h2>
+        <p className="font-black uppercase text-pinkSoft">Печать с вниманием</p>
+        <h2 className="mt-2 max-w-4xl font-display text-4xl font-black uppercase sm:text-6xl">Не просто печать. А аккуратный результат, который приятно получить.</h2>
         <div className="mt-10 grid gap-5 md:grid-cols-3">
           {items.map(([title, text], index) => (
             <motion.div key={title} whileHover={{ y: -10, rotate: index % 2 ? 2 : -2 }} className="peeled min-h-64 rounded-[2rem] bg-white p-6 text-graphite shadow-sticker">

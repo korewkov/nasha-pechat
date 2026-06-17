@@ -163,7 +163,7 @@ svg {
   padding-bottom: max(0.5rem, env(safe-area-inset-bottom));
 }
 
-.process-reel-video {
+.process-stage-video {
   position: absolute;
   inset: 0;
   height: 100%;
