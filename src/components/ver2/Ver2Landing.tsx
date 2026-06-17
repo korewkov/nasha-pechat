@@ -681,7 +681,6 @@ function WorksShowcase() {
                         <ChevronRight size={22} />
                       </button>
                     </div>
-                    <figcaption className="mt-3 text-sm font-black uppercase text-graphite/60">{activeItem.alt}</figcaption>
                   </figure>
                   <div className="mobile-snap flex gap-2 overflow-x-auto pb-2 lg:grid lg:max-h-[62svh] lg:grid-cols-1 lg:overflow-y-auto lg:overflow-x-hidden lg:pb-0">
                     {galleryItems.map((item, index) => (
