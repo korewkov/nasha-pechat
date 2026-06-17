@@ -9,6 +9,8 @@ import { ScrollTrigger } from "gsap/ScrollTrigger";
 import {
   Check,
   ChevronDown,
+  ChevronLeft,
+  ChevronRight,
   Copy,
   ExternalLink,
   Gift,
@@ -175,8 +177,6 @@ const galleryItems = [
   { src: "/works/optimized/stickers-1.jpg", alt: "Наклейки и небольшая полиграфия", category: "Документы" },
   { src: "/works/optimized/packaging-2.jpg", alt: "Готовый заказ перед выдачей", category: "Документы" }
 ] as const;
-
-const galleryFilters = ["Все", "Раскраски", "Фото", "Визитки", "Открытки", "Документы"] as const;
 
 const businessCardQuantities = [50, 100, 200] as const;
 const postcardQuantities = [1, 5, 10, 20] as const;
@@ -420,7 +420,7 @@ function HeroScene() {
         ))}
       </div>
       <nav className="fixed inset-x-4 top-4 z-[100] mx-auto flex max-w-7xl items-center justify-between rounded-full bg-white px-3 py-3 shadow-paper sm:px-5 sm:py-4">
-        <a href="/" className="relative h-11 w-[min(54vw,16rem)] overflow-hidden sm:h-14 sm:w-64" aria-label="Наша печать">
+        <a href="/" className="relative h-11 w-[min(54vw,16rem)] overflow-hidden pl-1.5 sm:h-14 sm:w-64 sm:pl-2" aria-label="Наша печать">
           <Image src="/brand/logos/logo-wide-alt.svg" alt="Наша печать" fill className="object-contain object-left" priority />
         </a>
         <div className="hidden gap-6 text-sm font-black uppercase text-graphite/60 md:flex">
@@ -559,10 +559,42 @@ function HorizontalGallery({
 }
 
 function WorksShowcase() {
-  const [activeFilter, setActiveFilter] = useState<(typeof galleryFilters)[number]>("Все");
   const [isOpen, setIsOpen] = useState(false);
-  const visibleItems = galleryItems.filter((item) => activeFilter === "Все" || item.category === activeFilter);
-  const previewItems = visibleItems.slice(0, 8);
+  const [activeIndex, setActiveIndex] = useState(0);
+  const previewItems = galleryItems.slice(0, 7);
+  const activeItem = galleryItems[activeIndex] ?? galleryItems[0];
+
+  useEffect(() => {
+    if (!isOpen) return;
+
+    const previousOverflow = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+
+    const onKeyDown = (event: KeyboardEvent) => {
+      if (event.key === "Escape") setIsOpen(false);
+      if (event.key === "ArrowRight") setActiveIndex((index) => (index + 1) % galleryItems.length);
+      if (event.key === "ArrowLeft") setActiveIndex((index) => (index - 1 + galleryItems.length) % galleryItems.length);
+    };
+
+    window.addEventListener("keydown", onKeyDown);
+    return () => {
+      document.body.style.overflow = previousOverflow;
+      window.removeEventListener("keydown", onKeyDown);
+    };
+  }, [isOpen]);
+
+  function openGallery(index: number) {
+    setActiveIndex(index);
+    setIsOpen(true);
+  }
+
+  function showNext() {
+    setActiveIndex((index) => (index + 1) % galleryItems.length);
+  }
+
+  function showPrev() {
+    setActiveIndex((index) => (index - 1 + galleryItems.length) % galleryItems.length);
+  }
 
   return (
     <section className="mx-auto max-w-7xl px-4 py-[clamp(3rem,10vw,4.5rem)] sm:px-6 lg:px-8">
@@ -576,42 +608,22 @@ function WorksShowcase() {
         </div>
         <button
           type="button"
-          onClick={() => setIsOpen(true)}
+          onClick={() => openGallery(0)}
           className="inline-flex min-h-11 w-fit items-center rounded-full bg-pinkBrand px-5 py-3 text-sm font-black uppercase text-white shadow-sticker"
         >
-          Смотреть больше
+          Ещё фото
         </button>
       </div>
 
-      <div className="mobile-snap mt-6 flex gap-2 overflow-x-auto pb-1 text-xs font-black uppercase text-graphite/60">
-        {galleryFilters.map((filter) => (
-          <button
-            key={filter}
-            type="button"
-            onClick={() => setActiveFilter(filter)}
-            className={`shrink-0 rounded-full px-4 py-2 transition ${
-              activeFilter === filter ? "bg-pinkBrand text-white shadow-sticker" : "bg-white text-graphite shadow-paper"
-            }`}
-          >
-            {filter}
-          </button>
-        ))}
-      </div>
-
-      <div className="mt-6 grid grid-cols-2 gap-3 sm:grid-cols-4 lg:gap-4">
+      <div className="mobile-snap mt-6 flex gap-3 overflow-x-auto pb-3 lg:grid lg:grid-cols-7 lg:overflow-visible lg:pb-0">
         {previewItems.map((item, index) => (
           <button
             key={`${item.src}-${index}`}
             type="button"
-            onClick={() => setIsOpen(true)}
-            className={`group relative overflow-hidden rounded-[1.25rem] bg-white shadow-paper ${index === 0 ? "sm:col-span-2 sm:row-span-2" : ""}`}
+            onClick={() => openGallery(index)}
+            className="group relative aspect-[4/5] w-[42vw] max-w-[170px] shrink-0 overflow-hidden rounded-[1.15rem] bg-white shadow-paper transition hover:-translate-y-1 hover:shadow-sticker sm:w-[22vw] lg:w-auto"
           >
-            <span className="relative block aspect-square">
-              <Image src={item.src} alt={item.alt} fill loading="lazy" className="object-cover transition duration-500 group-hover:scale-105" sizes="(min-width: 1024px) 18rem, 45vw" />
-            </span>
-            <span className="absolute inset-x-2 bottom-2 rounded-full bg-white/92 px-3 py-2 text-left text-[11px] font-black uppercase text-graphite shadow-paper">
-              {item.category}
-            </span>
+            <Image src={item.src} alt={item.alt} fill loading="lazy" className="object-cover transition duration-500 group-hover:scale-105" sizes="(min-width: 1024px) 10rem, 42vw" />
           </button>
         ))}
       </div>
@@ -619,21 +631,23 @@ function WorksShowcase() {
       <AnimatePresence>
         {isOpen && (
           <motion.div
-            className="fixed inset-0 z-[120] overflow-y-auto bg-graphite/78 px-4 py-6 backdrop-blur-sm sm:px-6"
+            className="fixed inset-0 z-[120] overflow-hidden bg-graphite/82 px-4 py-4 backdrop-blur-sm sm:px-6 sm:py-6"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
+            onClick={() => setIsOpen(false)}
           >
             <motion.div
-              className="mx-auto max-w-6xl rounded-[1.8rem] bg-white p-4 text-graphite shadow-paper sm:p-6 lg:rounded-[2.5rem]"
+              className="mx-auto flex max-h-[calc(100svh-2rem)] max-w-6xl flex-col overflow-hidden rounded-[1.8rem] bg-white p-4 text-graphite shadow-paper sm:max-h-[calc(100svh-3rem)] sm:p-6 lg:rounded-[2.5rem]"
               initial={{ y: 24, scale: 0.98 }}
               animate={{ y: 0, scale: 1 }}
               exit={{ y: 24, scale: 0.98 }}
+              onClick={(event) => event.stopPropagation()}
             >
-              <div className="flex items-start justify-between gap-4">
+              <div className="flex shrink-0 items-start justify-between gap-4">
                 <div>
                   <p className="font-black uppercase text-pinkBrand">Галерея</p>
-                  <h3 className="mt-1 font-display text-3xl font-black uppercase sm:text-5xl">Больше примеров</h3>
+                  <h3 className="mt-1 font-display text-3xl font-black uppercase sm:text-5xl">Примеры работ</h3>
                 </div>
                 <button
                   type="button"
@@ -644,15 +658,46 @@ function WorksShowcase() {
                   <X size={20} />
                 </button>
               </div>
-              <div className="mt-5 grid grid-cols-2 gap-3 md:grid-cols-3 lg:grid-cols-4">
-                {visibleItems.map((item) => (
-                  <figure key={item.src} className="overflow-hidden rounded-[1.2rem] bg-milk">
-                    <div className="relative aspect-square">
-                      <Image src={item.src} alt={item.alt} fill loading="lazy" className="object-cover" sizes="(min-width: 1024px) 16rem, 45vw" />
+
+              <div className="mt-5 min-h-0 overflow-y-auto pr-1">
+                <div className="grid gap-4 lg:grid-cols-[1fr_13rem]">
+                  <figure className="min-w-0">
+                    <div className="relative aspect-[4/3] max-h-[58svh] overflow-hidden rounded-[1.4rem] bg-milk">
+                      <Image src={activeItem.src} alt={activeItem.alt} fill priority className="object-contain" sizes="(min-width: 1024px) 60rem, 92vw" />
+                      <button
+                        type="button"
+                        onClick={showPrev}
+                        className="absolute left-3 top-1/2 grid h-11 w-11 -translate-y-1/2 place-items-center rounded-full bg-white/92 text-graphite shadow-paper"
+                        aria-label="Предыдущее фото"
+                      >
+                        <ChevronLeft size={22} />
+                      </button>
+                      <button
+                        type="button"
+                        onClick={showNext}
+                        className="absolute right-3 top-1/2 grid h-11 w-11 -translate-y-1/2 place-items-center rounded-full bg-white/92 text-graphite shadow-paper"
+                        aria-label="Следующее фото"
+                      >
+                        <ChevronRight size={22} />
+                      </button>
                     </div>
-                    <figcaption className="p-3 text-xs font-black uppercase text-graphite/65">{item.alt}</figcaption>
+                    <figcaption className="mt-3 text-sm font-black uppercase text-graphite/60">{activeItem.alt}</figcaption>
                   </figure>
-                ))}
+                  <div className="mobile-snap flex gap-2 overflow-x-auto pb-2 lg:grid lg:max-h-[62svh] lg:grid-cols-1 lg:overflow-y-auto lg:overflow-x-hidden lg:pb-0">
+                    {galleryItems.map((item, index) => (
+                      <button
+                        key={item.src}
+                        type="button"
+                        onClick={() => setActiveIndex(index)}
+                        className={`relative aspect-square h-20 w-20 shrink-0 overflow-hidden rounded-xl border-2 transition lg:h-auto lg:w-full ${
+                          activeIndex === index ? "border-pinkBrand shadow-sticker" : "border-transparent opacity-75 hover:opacity-100"
+                        }`}
+                      >
+                        <Image src={item.src} alt={item.alt} fill loading="lazy" className="object-cover" sizes="6rem" />
+                      </button>
+                    ))}
+                  </div>
+                </div>
               </div>
             </motion.div>
           </motion.div>
@@ -1151,13 +1196,15 @@ function Contacts() {
                   href={item.href}
                   target={item.external ? "_blank" : undefined}
                   rel={item.external ? "noreferrer" : undefined}
-                  className="group rounded-[1.35rem] border border-white/10 bg-white p-4 text-graphite shadow-paper transition hover:border-pinkBrand hover:bg-pinkSoft"
+                  className="group min-w-0 rounded-[1.35rem] border border-white/10 bg-white p-4 text-graphite shadow-paper transition hover:border-pinkBrand hover:bg-pinkSoft"
                 >
                   <span className="grid h-11 w-11 place-items-center rounded-full bg-pinkBrand text-white shadow-sticker">
                     {item.label === "ВКонтакте" ? <span className="text-sm font-black">VK</span> : <Icon size={20} />}
                   </span>
                   <span className="mt-4 block text-xs font-black uppercase text-graphite/50">{item.label}</span>
-                  <span className="mt-1 block whitespace-nowrap text-[clamp(0.82rem,2.6vw,1rem)] font-black text-graphite">{item.value}</span>
+                  <span className="mt-1 block max-w-full text-balance text-[clamp(0.82rem,2.6vw,0.98rem)] font-black leading-tight text-graphite [overflow-wrap:anywhere]">
+                    {item.value}
+                  </span>
                 </a>
               );
             })}
